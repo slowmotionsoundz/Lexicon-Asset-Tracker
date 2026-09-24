@@ -1,0 +1,8 @@
+{
+  "name": "C# Asset Tracker Interactive Pitch Deck",
+  "description": "An interactive, self-contained slide deck explaining a C# Asset Tracking System in simple ELI5 terms with dynamic widgets and smooth transitions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

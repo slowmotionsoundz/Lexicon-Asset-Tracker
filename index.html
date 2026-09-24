@@ -1,0 +1,4814 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lexicon Malmö — GearKeeper Device Tracker Pitch Deck</title>
+    <meta name="description" content="An interactive, self-contained slide deck explaining the Lexicon Malmö GearKeeper C# Device Tracking System in simple ELI5 terms with dynamic widgets." />
+    <meta property="og:title" content="Lexicon Malmö — GearKeeper Device Tracker Pitch Deck" />
+    <meta property="og:description" content="An interactive, self-contained slide deck explaining the Lexicon Malmö GearKeeper C# Device Tracking System in simple ELI5 terms with dynamic widgets." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts: Outfit (Display & Headings) + Plus Jakarta Sans (Body) + JetBrains Mono (Code/Numbers) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+      :root {
+        --bg: #070a13;
+        --surface: #0f172a;
+        --surface-card: rgba(18, 26, 47, 0.75);
+        --surface-card-hover: rgba(28, 41, 71, 0.85);
+        --surface-border: rgba(255, 255, 255, 0.08);
+        --surface-border-bright: rgba(255, 255, 255, 0.16);
+        
+        --accent-cyan: #06b6d4;
+        --accent-cyan-glow: rgba(6, 182, 212, 0.35);
+        --accent-emerald: #10b981;
+        --accent-emerald-glow: rgba(16, 185, 129, 0.35);
+        --accent-amber: #f59e0b;
+        --accent-amber-glow: rgba(245, 158, 11, 0.35);
+        --accent-rose: #f43f5e;
+        --accent-rose-glow: rgba(244, 63, 94, 0.35);
+        --accent-violet: #8b5cf6;
+        --accent-violet-glow: rgba(139, 92, 246, 0.35);
+        
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      html, body {
+        width: 100%;
+        height: 100%;
+        background-color: var(--bg);
+        color: var(--text-primary);
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        overflow: hidden;
+        user-select: none;
+      }
+
+      h1, h2, h3, h4, .font-display {
+        font-family: 'Outfit', sans-serif;
+        letter-spacing: -0.02em;
+      }
+
+      code, pre, .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Ambient Background Glows */
+      .ambient-glow {
+        position: fixed;
+        pointer-events: none;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.28;
+        z-index: 0;
+        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+      }
+      .glow-1 {
+        width: 550px;
+        height: 550px;
+        top: -100px;
+        left: -100px;
+        background: radial-gradient(circle, #3b82f6 0%, rgba(59,130,246,0) 70%);
+      }
+      .glow-2 {
+        width: 600px;
+        height: 600px;
+        bottom: -150px;
+        right: -100px;
+        background: radial-gradient(circle, #8b5cf6 0%, rgba(139,92,246,0) 70%);
+      }
+      .glow-3 {
+        width: 450px;
+        height: 450px;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle, #06b6d4 0%, rgba(6,182,212,0) 70%);
+      }
+
+      /* Grid Texture */
+      .bg-grid-overlay {
+        position: fixed;
+        inset: 0;
+        background-image: 
+          linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* Layout */
+      .deck-wrapper {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        z-index: 10;
+      }
+
+      /* Top Header */
+      header.deck-header {
+        height: 64px;
+        padding: 0 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--surface-border);
+        background: rgba(7, 10, 19, 0.7);
+        backdrop-filter: blur(16px);
+        flex-shrink: 0;
+        z-index: 20;
+      }
+
+      .header-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 16px rgba(6, 182, 212, 0.4);
+        color: #fff;
+        font-weight: 800;
+        font-size: 16px;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .brand-text {
+        font-size: 16px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: -0.01em;
+      }
+
+      .header-center {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--surface-border);
+        padding: 6px 14px;
+        border-radius: 9999px;
+      }
+
+      .progress-bar-bg {
+        width: 140px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        width: 20%;
+        background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+        border-radius: 999px;
+        transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .slide-counter {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .timer-display {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--surface-border);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--text-secondary);
+      }
+
+      .timer-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent-emerald);
+        box-shadow: 0 0 8px var(--accent-emerald);
+        animation: pulse 2s infinite;
+      }
+
+      .btn-icon {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--surface-border);
+        color: var(--text-secondary);
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-icon:hover {
+        background: rgba(255, 255, 255, 0.09);
+        color: var(--text-primary);
+        border-color: var(--surface-border-bright);
+        transform: translateY(-1px);
+      }
+
+      /* Main Stage */
+      main.deck-stage {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+      }
+
+      .slide {
+        position: absolute;
+        inset: 10px 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        opacity: 0;
+        transform: scale(0.97) translateX(40px);
+        pointer-events: none;
+        transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        max-width: 1480px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .slide.active {
+        opacity: 1;
+        transform: scale(1) translateX(0);
+        pointer-events: auto;
+      }
+
+      .slide.prev {
+        opacity: 0;
+        transform: scale(0.97) translateX(-40px);
+      }
+
+      /* Slide Typography */
+      .slide-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent-cyan);
+        margin-bottom: 6px;
+      }
+
+      .slide-title {
+        font-size: clamp(30px, 3.4vw, 48px);
+        font-weight: 800;
+        line-height: 1.15;
+        margin-bottom: 8px;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        max-width: 1100px;
+        text-wrap: balance;
+      }
+
+      .slide-subtitle {
+        font-size: clamp(15px, 1.25vw, 18.5px);
+        color: var(--text-secondary);
+        line-height: 1.5;
+        max-width: 950px;
+        margin-bottom: 16px;
+      }
+
+      /* ELI5 Callout Pill Card */
+      .eli5-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+        background: linear-gradient(90deg, rgba(6, 182, 212, 0.1) 0%, rgba(139, 92, 246, 0.08) 100%);
+        border-left: 4px solid var(--accent-cyan);
+        border-radius: 0 14px 14px 0;
+        padding: 12px 20px;
+        margin-bottom: 18px;
+      }
+
+      .eli5-icon {
+        font-size: 22px;
+        line-height: 1;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .eli5-content strong {
+        color: #38bdf8;
+        font-size: 14px;
+        letter-spacing: 0.02em;
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      .eli5-content p {
+        font-size: 14.5px;
+        color: #f1f5f9;
+        line-height: 1.45;
+      }
+
+      /* Cover / Intro Slide 1 Styles */
+      .cover-container {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 32px;
+        align-items: stretch;
+      }
+
+      .cover-hero-card {
+        padding: 36px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: linear-gradient(145deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.6) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .cover-hero-card::before {
+        content: '';
+        position: absolute;
+        top: -80px;
+        right: -80px;
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .cover-badge-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+
+      .cover-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12.5px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+      }
+
+      .cover-badge.school {
+        background: rgba(2, 132, 199, 0.2);
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        color: #7dd3fc;
+      }
+
+      .cover-badge.net {
+        background: rgba(139, 92, 246, 0.2);
+        border: 1px solid rgba(167, 139, 250, 0.4);
+        color: #c4b5fd;
+      }
+
+      .cover-title {
+        font-size: clamp(34px, 4vw, 56px);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 14px;
+        color: #ffffff;
+      }
+
+      .cover-subtitle {
+        font-size: 17px;
+        color: #cbd5e1;
+        line-height: 1.5;
+        margin-bottom: 28px;
+        max-width: 620px;
+      }
+
+      .presenter-pill-box {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 12px 18px;
+        border-radius: 12px;
+        margin-top: auto;
+      }
+
+      .presenter-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        box-shadow: 0 0 14px rgba(6, 182, 212, 0.4);
+        flex-shrink: 0;
+      }
+
+      .presenter-info {
+        flex: 1;
+      }
+
+      .presenter-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #94a3b8;
+        letter-spacing: 0.05em;
+      }
+
+      .presenter-name-input {
+        background: transparent;
+        border: none;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.25);
+        color: #fff;
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        width: 100%;
+        outline: none;
+        padding: 2px 0;
+        transition: border-color 0.2s;
+      }
+
+      .presenter-name-input:focus {
+        border-bottom-color: #38bdf8;
+      }
+
+      .presenter-course {
+        font-size: 12px;
+        color: #38bdf8;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .cover-agenda-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .cover-agenda-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 12px;
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.2s ease;
+      }
+
+      .cover-agenda-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateX(4px);
+      }
+
+      .cover-agenda-num {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: rgba(6, 182, 212, 0.15);
+        color: #38bdf8;
+        font-weight: 800;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'JetBrains Mono', monospace;
+        flex-shrink: 0;
+      }
+
+      .cover-agenda-text h4 {
+        font-size: 15px;
+        color: #fff;
+        margin-bottom: 2px;
+      }
+
+      .cover-agenda-text p {
+        font-size: 12.5px;
+        color: #94a3b8;
+        line-height: 1.35;
+      }
+
+      /* Glass Card */
+      .glass-panel {
+        background: var(--surface-card);
+        border: 1px solid var(--surface-border);
+        border-radius: 16px;
+        backdrop-filter: blur(16px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      .glass-panel:hover {
+        border-color: var(--surface-border-bright);
+      }
+
+      /* Bottom Navigation */
+      footer.deck-footer {
+        height: 68px;
+        padding: 0 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid var(--surface-border);
+        background: rgba(7, 10, 19, 0.85);
+        backdrop-filter: blur(16px);
+        flex-shrink: 0;
+        z-index: 20;
+      }
+
+      .nav-dots {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-dot-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 8px;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .nav-dot-btn .indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: all 0.2s ease;
+      }
+
+      .nav-dot-btn:hover {
+        color: var(--text-secondary);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .nav-dot-btn.active {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.12);
+      }
+
+      .nav-dot-btn.active .indicator {
+        background: var(--accent-cyan);
+        box-shadow: 0 0 10px var(--accent-cyan);
+        transform: scale(1.25);
+      }
+
+      .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .btn-nav {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--surface-border);
+        color: var(--text-primary);
+        font-size: 13px;
+        font-weight: 600;
+        padding: 9px 18px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        user-select: none;
+      }
+
+      .btn-nav:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+      }
+
+      .btn-nav:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+
+      .btn-nav.primary {
+        background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);
+        border: none;
+        box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
+      }
+
+      .btn-nav.primary:hover:not(:disabled) {
+        box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45);
+      }
+
+      .nav-hint {
+        font-size: 11px;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .key-kbd {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 10px;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* -------------------------------------------------------------------------- */
+      /* SLIDE 1 SPECIFIC STYLES: CHAOS VS TRACKER                                   */
+      /* -------------------------------------------------------------------------- */
+      .slide-1-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.3fr;
+        gap: 28px;
+        align-items: stretch;
+      }
+
+      .feature-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .feature-item .icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .feature-item h4 {
+        font-size: 14px;
+        color: #fff;
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+
+      .feature-item p {
+        font-size: 12.5px;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+
+      .sim-toggle-bar {
+        display: flex;
+        background: rgba(0, 0, 0, 0.35);
+        padding: 4px;
+        border-radius: 10px;
+        gap: 4px;
+        margin-bottom: 16px;
+      }
+
+      .sim-toggle-btn {
+        flex: 1;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      .sim-toggle-btn.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      .sim-toggle-btn.active.chaos {
+        background: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+      }
+
+      .sim-toggle-btn.active.tracked {
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+      }
+
+      .sim-stage {
+        height: 270px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      /* Chaos items */
+      .chaos-gadget {
+        position: absolute;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11.5px;
+        color: #fca5a5;
+        animation: floatRandom 4s ease-in-out infinite alternate;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @keyframes floatRandom {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(6px, -8px) rotate(2deg); }
+        100% { transform: translate(-8px, 6px) rotate(-3deg); }
+      }
+
+      /* Tracked Grid View */
+      .tracked-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        width: 100%;
+        height: 100%;
+      }
+
+      .office-col {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 8px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .office-col-header {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #38bdf8;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .device-chip {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 6px;
+        padding: 6px 8px;
+        font-size: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        animation: fadeIn 0.4s ease forwards;
+      }
+
+      /* -------------------------------------------------------------------------- */
+      /* SLIDE 3 SPECIFIC STYLES: OOP INHERITANCE TREE                              */
+      /* -------------------------------------------------------------------------- */
+      .slide-2-container {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 28px;
+        align-items: center;
+      }
+
+      .tree-interactive-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        padding: 20px;
+      }
+
+      .tree-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--surface-border);
+        border-radius: 14px;
+        padding: 16px 22px;
+        width: 320px;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+      }
+
+      .tree-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--surface-border-bright);
+      }
+
+      .tree-card.selected {
+        background: rgba(6, 182, 212, 0.12);
+        border-color: var(--accent-cyan);
+        box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
+      }
+
+      .tree-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+
+      .tree-card-title {
+        font-size: 15.5px;
+        font-weight: 700;
+        color: #fff;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .badge-role {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 5px;
+      }
+
+      .badge-parent {
+        background: rgba(139, 92, 246, 0.2);
+        color: #c4b5fd;
+        border: 1px solid rgba(139, 92, 246, 0.3);
+      }
+
+      .badge-child {
+        background: rgba(6, 182, 212, 0.2);
+        color: #67e8f9;
+        border: 1px solid rgba(6, 182, 212, 0.3);
+      }
+
+      .tree-card-desc {
+        font-size: 12.5px;
+        color: var(--text-secondary);
+        line-height: 1.4;
+      }
+
+      .tree-lines {
+        width: 100%;
+        height: 48px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+      }
+
+      .tree-lines svg {
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+
+      .tree-children-row {
+        display: flex;
+        gap: 20px;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .tree-children-row .tree-card {
+        width: 240px;
+      }
+
+      .inspector-panel {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .code-snippet-box {
+        background: #090d16;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 16px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        line-height: 1.55;
+        color: #94a3b8;
+        overflow-x: auto;
+      }
+
+      .c-kw { color: #f43f5e; font-weight: 600; }
+      .c-type { color: #38bdf8; font-weight: 600; }
+      .c-var { color: #e2e8f0; }
+      .c-str { color: #a7f3d0; }
+      .c-com { color: #64748b; font-style: italic; }
+      .c-num { color: #f59e0b; }
+
+      .traits-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .trait-tag {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 12px;
+        border-radius: 7px;
+        background: rgba(255, 255, 255, 0.03);
+        font-size: 12px;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .trait-inherited {
+        color: #c4b5fd;
+      }
+
+      .trait-unique {
+        color: #67e8f9;
+      }
+
+      /* -------------------------------------------------------------------------- */
+      /* SLIDE 4 SPECIFIC STYLES: INTERACTIVE ANIMATED UML CLASS DIAGRAM            */
+      /* -------------------------------------------------------------------------- */
+      .uml-workbench-window {
+        background: #0a0e17;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        height: 460px;
+        max-height: 460px;
+        width: 100%;
+      }
+
+      .uml-panes {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+        height: 355px;
+        background: #090d16;
+        overflow: hidden;
+      }
+
+      .uml-stage {
+        flex: 1.36;
+        min-width: 0;
+        position: relative;
+        height: 100%;
+        background: radial-gradient(circle at 50% 36%, rgba(20, 30, 48, 0.7) 0%, rgba(7, 10, 18, 0.98) 100%);
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .uml-svg-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        user-select: none;
+      }
+
+      .uml-svg-node {
+        cursor: pointer;
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        outline: none;
+      }
+
+      .uml-svg-node:hover .node-rect {
+        stroke: #38bdf8;
+        stroke-width: 1.5;
+        filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.45));
+      }
+
+      .uml-svg-node.selected .node-rect {
+        stroke: var(--accent-cyan);
+        stroke-width: 2;
+        filter: drop-shadow(0 0 16px rgba(6, 182, 212, 0.65));
+      }
+
+      .uml-svg-node.node-flashing .node-rect {
+        animation: svgNodeFlash 0.55s ease-in-out 2;
+      }
+
+      @keyframes svgNodeFlash {
+        0%, 100% { stroke: var(--accent-cyan); stroke-width: 2; filter: drop-shadow(0 0 16px rgba(6, 182, 212, 0.6)); }
+        50% { stroke: #fff; stroke-width: 2.5; filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.95)); }
+      }
+
+      .node-rect {
+        fill: #0c1424;
+        stroke: rgba(255, 255, 255, 0.14);
+        stroke-width: 1;
+        transition: stroke 0.2s ease, filter 0.2s ease;
+      }
+
+      .node-header-bg {
+        fill: rgba(255, 255, 255, 0.04);
+      }
+
+      .node-divider {
+        stroke: rgba(255, 255, 255, 0.08);
+        stroke-width: 1;
+      }
+
+      .uml-inspector-pane {
+        flex: 0.96;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow-y: auto;
+        padding: 14px 18px;
+        background: #0a0e17;
+        gap: 10px;
+      }
+
+      /* Animated SVG Elements */
+      .uml-conn-line {
+        stroke: rgba(255, 255, 255, 0.35);
+        stroke-width: 2;
+        fill: none;
+        transition: stroke 0.3s ease;
+      }
+
+      .uml-conn-line.active-flow {
+        stroke: #06b6d4;
+        stroke-dasharray: 6 5;
+        animation: umlFlowDash 0.85s linear infinite;
+      }
+
+      .uml-conn-arrow {
+        fill: #070b14;
+        stroke: rgba(255, 255, 255, 0.65);
+        stroke-width: 1.5;
+        transition: stroke 0.3s ease, fill 0.3s ease;
+      }
+
+      .uml-conn-arrow.active-flow {
+        stroke: #38bdf8;
+        fill: rgba(6, 182, 212, 0.35);
+      }
+
+      @keyframes umlFlowDash {
+        from { stroke-dashoffset: 22; }
+        to { stroke-dashoffset: 0; }
+      }
+
+      .uml-pulse-dot {
+        fill: #38bdf8;
+        filter: drop-shadow(0 0 8px #06b6d4);
+        transition: opacity 0.3s ease;
+      }
+
+      .uml-pulse-dot.flowing {
+        opacity: 1 !important;
+        animation: umlParticlePulse 1.2s ease-in-out infinite alternate;
+      }
+
+      @keyframes umlParticlePulse {
+        0% { r: 3.5; opacity: 0.65; fill: #38bdf8; }
+        100% { r: 5.5; opacity: 1; fill: #67e8f9; }
+      }
+
+      /* -------------------------------------------------------------------------- */
+      /* SLIDE 3 SPECIFIC STYLES: MULTI-OFFICE & CURRENCY                           */
+      /* -------------------------------------------------------------------------- */
+      .slide-3-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 28px;
+        align-items: center;
+      }
+
+      .currency-calculator-card {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .office-selector-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        background: rgba(0, 0, 0, 0.35);
+        padding: 5px;
+        border-radius: 10px;
+      }
+
+      .office-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 10px 8px;
+        border-radius: 8px;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .office-btn:hover {
+        background: rgba(255, 255, 255, 0.04);
+        color: #fff;
+      }
+
+      .office-btn.active {
+        background: rgba(6, 182, 212, 0.15);
+        border-color: var(--accent-cyan);
+        color: #fff;
+        box-shadow: 0 0 16px rgba(6, 182, 212, 0.2);
+      }
+
+      .office-flag {
+        font-size: 18px;
+      }
+
+      .office-name {
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .office-curr {
+        font-size: 10px;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--text-muted);
+      }
+
+      .office-btn.active .office-curr {
+        color: #67e8f9;
+      }
+
+      .amount-control {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .amount-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+
+      .slider-input {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        outline: none;
+        cursor: pointer;
+      }
+
+      .slider-input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--accent-cyan);
+        box-shadow: 0 0 10px var(--accent-cyan);
+        cursor: pointer;
+        transition: transform 0.1s ease;
+      }
+
+      .slider-input::-webkit-slider-thumb:hover {
+        transform: scale(1.2);
+      }
+
+      .price-hero-box {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+        border: 1px solid rgba(6, 182, 212, 0.25);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .price-hero-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #38bdf8;
+        margin-bottom: 6px;
+      }
+
+      .price-hero-val {
+        font-size: 36px;
+        font-weight: 800;
+        color: #fff;
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: -0.03em;
+      }
+
+      .price-conversion-formula {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 6px;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* -------------------------------------------------------------------------- */
+      /* SLIDE 4 SPECIFIC STYLES: TRAFFIC LIGHT EXPIRATION                          */
+      /* -------------------------------------------------------------------------- */
+      .slide-4-container {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 28px;
+        align-items: center;
+      }
+
+      .traffic-light-rig {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 24px;
+        border-radius: 16px;
+        border: 1px solid var(--surface-border);
+      }
+
+      .traffic-light-housing {
+        width: 90px;
+        background: #0b0f19;
+        border: 2px solid #1e293b;
+        border-radius: 45px;
+        padding: 16px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.05);
+        flex-shrink: 0;
+      }
+
+      .light-bulb {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: #1e293b;
+        opacity: 0.25;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+      }
+
+      .light-bulb.red.active {
+        background: #ef4444;
+        opacity: 1;
+        box-shadow: 0 0 25px #ef4444, 0 0 50px rgba(239, 68, 68, 0.5);
+      }
+
+      .light-bulb.yellow.active {
+        background: #f59e0b;
+        opacity: 1;
+        box-shadow: 0 0 25px #f59e0b, 0 0 50px rgba(245, 158, 11, 0.5);
+      }
+
+      .light-bulb.green.active {
+        background: #10b981;
+        opacity: 1;
+        box-shadow: 0 0 25px #10b981, 0 0 50px rgba(16, 185, 129, 0.5);
+      }
+
+      .device-preview-card {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--surface-border);
+        border-radius: 14px;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        transition: all 0.3s ease;
+      }
+
+      .device-preview-card.status-green {
+        border-color: rgba(16, 185, 129, 0.5);
+        background: rgba(16, 185, 129, 0.05);
+      }
+
+      .device-preview-card.status-yellow {
+        border-color: rgba(245, 158, 11, 0.5);
+        background: rgba(245, 158, 11, 0.05);
+      }
+
+      .device-preview-card.status-red {
+        border-color: rgba(239, 68, 68, 0.5);
+        background: rgba(239, 68, 68, 0.05);
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        width: fit-content;
+      }
+
+      .pill-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+      .pill-yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+      .pill-red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+      .slider-control-card {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .slider-ticks {
+        display: flex;
+        justify-content: space-between;
+        font-size: 10.5px;
+        color: var(--text-muted);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      /* -------------------------------------------------------------------------- */
+      /* SLIDE 7 SPECIFIC STYLES: CONSOLE VIEW & SYSTEM SUMMARY                     */
+      /* -------------------------------------------------------------------------- */
+      .slide-5-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 24px;
+        align-items: stretch;
+      }
+
+      .terminal-window {
+        background: #0a0e17;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      }
+
+      .terminal-header {
+        background: #111827;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .term-dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      .term-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .term-dot.r { background: #ef4444; }
+      .term-dot.y { background: #f59e0b; }
+      .term-dot.g { background: #10b981; }
+
+      .term-title {
+        font-size: 11.5px;
+        color: var(--text-secondary);
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .term-body {
+        padding: 16px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12.5px;
+        color: #cbd5e1;
+        overflow-y: auto;
+        max-height: 330px;
+      }
+
+      .term-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .term-table th {
+        text-align: left;
+        color: #94a3b8;
+        font-weight: 600;
+        padding: 8px 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 11.5px;
+      }
+
+      .term-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        transition: background 0.15s ease;
+      }
+
+      .term-table tr:hover td {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .term-table tr.row-red td {
+        color: #fca5a5;
+      }
+
+      .term-table tr.row-yellow td {
+        color: #fde68a;
+      }
+
+      .term-table tr.row-green td {
+        color: #86efac;
+      }
+
+      .summary-cards-col {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .summary-bullet-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--surface-border);
+        border-radius: 12px;
+        padding: 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+      }
+
+      .summary-bullet-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        background: rgba(6, 182, 212, 0.15);
+        color: #38bdf8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      /* -------------------------------------------------------------------------- */
+      /* SLIDE 8 SPECIFIC STYLES: .NET 10 C# CODE WORKBENCH (SAME MODULE SIZE)      */
+      /* -------------------------------------------------------------------------- */
+      .csharp-workbench-window {
+        background: #0a0e17;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        height: 460px;
+        max-height: 460px;
+        width: 100%;
+      }
+
+      .workbench-top-bar {
+        background: #111827;
+        padding: 8px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        gap: 12px;
+      }
+
+      .workbench-view-tabs {
+        display: flex;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.45);
+        padding: 2px;
+        border-radius: 7px;
+        gap: 2px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .workbench-view-tab {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11.5px;
+        font-weight: 500;
+        padding: 4px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .workbench-view-tab:hover {
+        color: #fff;
+      }
+
+      .workbench-view-tab.active {
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .net-badge {
+        font-size: 10px;
+        font-family: 'JetBrains Mono', monospace;
+        background: rgba(139, 92, 246, 0.2);
+        color: #c4b5fd;
+        border: 1px solid rgba(139, 92, 246, 0.35);
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-weight: 600;
+      }
+
+      .btn-ide {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        border: 1px solid transparent;
+      }
+
+      .btn-ide.run {
+        background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+        color: #fff;
+        box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
+      }
+      .btn-ide.run:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.5);
+      }
+
+      .btn-ide.secondary {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-secondary);
+        border-color: rgba(255, 255, 255, 0.08);
+      }
+      .btn-ide.secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      .ide-presets-bar {
+        background: rgba(0, 0, 0, 0.4);
+        padding: 6px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        flex-wrap: wrap;
+      }
+
+      .location-toggle-group {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        padding: 2px 4px;
+      }
+
+      .loc-btn {
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .loc-btn:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .loc-btn.active {
+        background: rgba(6, 182, 212, 0.25);
+        color: #38bdf8;
+        border: 1px solid rgba(6, 182, 212, 0.4);
+        font-weight: 700;
+      }
+
+      .preset-chip {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 5px;
+        color: var(--text-secondary);
+        font-size: 11px;
+        padding: 3px 8px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.15s ease;
+        font-family: 'JetBrains Mono', monospace;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .preset-chip:hover {
+        background: rgba(6, 182, 212, 0.15);
+        border-color: rgba(6, 182, 212, 0.4);
+        color: #67e8f9;
+        transform: translateY(-1px);
+      }
+      .preset-chip.tablet {
+        border-color: rgba(168, 85, 247, 0.3);
+        color: #d8b4fe;
+      }
+      .preset-chip.tablet:hover {
+        background: rgba(168, 85, 247, 0.2);
+        border-color: rgba(168, 85, 247, 0.5);
+        color: #f3e8ff;
+      }
+      .preset-chip.phone {
+        border-color: rgba(52, 211, 153, 0.3);
+        color: #a7f3d0;
+      }
+      .preset-chip.phone:hover {
+        background: rgba(52, 211, 153, 0.2);
+        border-color: rgba(52, 211, 153, 0.5);
+        color: #ecfdf5;
+      }
+      .preset-chip.laptop {
+        border-color: rgba(56, 189, 248, 0.3);
+        color: #bae6fd;
+      }
+      .preset-chip.laptop:hover {
+        background: rgba(56, 189, 248, 0.2);
+        border-color: rgba(56, 189, 248, 0.5);
+        color: #f0f9ff;
+      }
+
+      /* Custom Add Device Drawer / Form */
+      .linq-filter-bar {
+        background: #0d131f;
+        padding: 5px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        flex-wrap: wrap;
+      }
+
+      .linq-btn, .linq-sort-btn {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+        color: #cbd5e1;
+        font-size: 11px;
+        font-family: 'JetBrains Mono', monospace;
+        padding: 2px 8px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .linq-btn:hover {
+        background: rgba(56, 189, 248, 0.15);
+        border-color: rgba(56, 189, 248, 0.4);
+        color: #38bdf8;
+      }
+
+      .linq-btn.active {
+        background: rgba(56, 189, 248, 0.25);
+        border-color: #38bdf8;
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+      }
+
+      .linq-sort-btn:hover {
+        background: rgba(192, 132, 252, 0.15);
+        border-color: rgba(192, 132, 252, 0.4);
+        color: #c084fc;
+      }
+
+      .linq-sort-btn.active {
+        background: rgba(192, 132, 252, 0.25);
+        border-color: #c084fc;
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 0 8px rgba(192, 132, 252, 0.3);
+      }
+
+      .drawer-select, .drawer-input {
+        background: #090d16;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 5px;
+        color: #e2e8f0;
+        font-family: inherit;
+        font-size: 11.5px;
+        padding: 3px 8px;
+        outline: none;
+      }
+
+      .drawer-select:focus, .drawer-input:focus {
+        border-color: #38bdf8;
+      }
+
+      .btn-add-device-submit {
+        background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        font-weight: 700;
+        font-size: 11.5px;
+        padding: 4px 12px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.15s ease;
+      }
+      .btn-add-device-submit:hover {
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+        transform: translateY(-1px);
+      }
+
+      /* Highlight animation for newly added row */
+      @keyframes rowHighlightPulse {
+        0% { background: rgba(6, 182, 212, 0.45); }
+        50% { background: rgba(6, 182, 212, 0.25); }
+        100% { background: transparent; }
+      }
+
+      .row-highlight {
+        animation: rowHighlightPulse 2.5s ease-out;
+      }
+
+      .workbench-panes {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+        height: 355px;
+        background: #090d16;
+        overflow: hidden;
+      }
+
+      .workbench-code-pane {
+        flex: 1.12;
+        min-width: 0;
+        display: flex;
+        height: 100%;
+        overflow: hidden;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        position: relative;
+      }
+
+      .workbench-console-pane {
+        flex: 0.98;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow-y: auto;
+        padding: 10px 14px;
+        background: #0a0e17;
+      }
+
+      .line-gutter {
+        width: 38px;
+        background: #090d16;
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+        color: #475569;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        line-height: 20px;
+        padding: 8px 6px 8px 0;
+        text-align: right;
+        user-select: none;
+        overflow: hidden;
+      }
+
+      .code-textarea {
+        flex: 1;
+        background: #090d16;
+        color: #e2e8f0;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12.5px;
+        line-height: 20px;
+        padding: 8px 12px;
+        border: none;
+        outline: none;
+        resize: none;
+        white-space: pre;
+        overflow: auto;
+        tab-size: 4;
+        caret-color: #38bdf8;
+      }
+
+      .build-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10.5px;
+        font-family: 'JetBrains Mono', monospace;
+        color: #34d399;
+      }
+
+      .build-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 8px #10b981;
+      }
+
+      .toast-msg {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: rgba(15, 23, 42, 0.95);
+        color: #fff;
+        border: 1px solid var(--accent-cyan);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.3);
+        padding: 8px 18px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        z-index: 1000;
+        pointer-events: none;
+        opacity: 0;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .toast-msg.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* Modal / Drawer for Presenter Notes */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+
+      .modal-backdrop.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-content {
+        background: #0f172a;
+        border: 1px solid var(--surface-border-bright);
+        border-radius: 16px;
+        width: 90%;
+        max-width: 580px;
+        padding: 24px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      }
+
+      /* Keyframe animations */
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 960px) {
+        .slide-1-grid, .slide-2-container, .slide-3-grid, .slide-4-container, .slide-5-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        .uml-workbench-window,
+        .csharp-workbench-window {
+          height: auto;
+          max-height: none;
+        }
+        .uml-panes,
+        .workbench-panes {
+          flex-direction: column;
+          height: auto;
+        }
+        .uml-stage {
+          border-right: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          height: 260px;
+        }
+        .uml-inspector-pane {
+          height: auto;
+          min-height: 180px;
+        }
+        .workbench-code-pane {
+          border-right: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          height: 220px;
+        }
+        .workbench-console-pane {
+          height: 200px;
+        }
+        .tree-children-row {
+          flex-direction: column;
+          align-items: center;
+        }
+        .tree-children-row .tree-card {
+          width: 280px;
+        }
+        .tree-lines {
+          display: none;
+        }
+        .slide {
+          inset: 12px;
+          overflow-y: auto;
+          display: block;
+          padding: 10px;
+        }
+        .deck-header, .deck-footer {
+          padding: 0 16px;
+        }
+        .nav-hint {
+          display: none;
+        }
+        .nav-dot-btn span {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Background visual mesh -->
+    <div class="ambient-glow glow-1" id="glow1"></div>
+    <div class="ambient-glow glow-2" id="glow2"></div>
+    <div class="ambient-glow glow-3" id="glow3"></div>
+    <div class="bg-grid-overlay"></div>
+
+    <div class="deck-wrapper">
+      <!-- TOP NAVIGATION BAR -->
+      <header class="deck-header">
+        <div class="header-brand">
+          <div class="brand-badge" style="background:#0284c7; color:#fff; font-size:11px; font-weight:800; padding:2px 6px; border-radius:5px;">🇸🇪 Malmö</div>
+          <span class="brand-text">Lexicon <span style="color:#38bdf8;">GearKeeper</span></span>
+        </div>
+
+        <div class="header-center">
+          <div class="progress-container">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+            <span class="slide-counter" id="slideCounter">Slide 1 of 8</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="timer-display" title="3-5 Min Pitch Timer">
+            <span class="timer-dot"></span>
+            <span id="pitchTimerText">00:00</span>
+          </div>
+          <button class="btn-icon" id="btnNotes" title="Presenter Notes (Press P)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          </button>
+          <button class="btn-icon" id="btnAudioToggle" title="Toggle Sound Feedback">
+            <svg id="audioIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+          </button>
+          <button class="btn-icon" id="btnFullscreen" title="Toggle Fullscreen">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- PRESENTATION SLIDES STAGE -->
+      <main class="deck-stage" id="deckStage">
+        <!-- ==================================================================== -->
+        <!-- SLIDE 1: INTRODUCTORY & COVER SLIDE                                  -->
+        <!-- ==================================================================== -->
+        <section class="slide active" data-slide="1">
+          <div class="cover-container">
+            <!-- Left Hero Card -->
+            <div class="cover-hero-card">
+              <div>
+                <div class="cover-badge-row">
+                  <span class="cover-badge school">🇸🇪 Lexicon Malmö</span>
+                  <span class="cover-badge net">.NET 10 / C# 14</span>
+                  <span class="cover-badge" style="background:rgba(16,185,129,0.15); color:#6ee7b7; border:1px solid rgba(16,185,129,0.3);">OOP Project</span>
+                </div>
+
+                <h1 class="cover-title">
+                  Lexicon <span style="background:linear-gradient(135deg, #38bdf8 0%, #818cf8 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">GearKeeper</span>
+                </h1>
+                <p class="cover-subtitle">
+                  An automated Object-Oriented Device & Asset Tracking System with Multi-Currency Math and 3-Year Lifecycle Alerts.
+                </p>
+              </div>
+
+              <!-- Presenter Info Box (Editable name field for convenience) -->
+              <div class="presenter-pill-box">
+                <div class="presenter-avatar">👨‍💻</div>
+                <div class="presenter-info">
+                  <div class="presenter-label">Presenter / Developer</div>
+                  <input type="text" class="presenter-name-input" id="presenterNameInput" value="C# .NET Developer" title="Click to enter your name" />
+                  <div class="presenter-course">Lexicon Malmö • .NET Fullstack Program 2026</div>
+                </div>
+                <button class="btn-nav primary" id="btnStartDeck" style="padding:10px 20px; font-size:13.5px;">
+                  Start Presentation ➔
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Agenda Overview -->
+            <div class="cover-agenda-grid">
+              <div style="margin-bottom:4px;">
+                <span class="slide-tag" style="margin-bottom:4px;">Deck Overview</span>
+                <h3 style="font-size:17px; color:#fff;">What We're Covering</h3>
+              </div>
+
+              <div class="cover-agenda-item">
+                <div class="cover-agenda-num">01</div>
+                <div class="cover-agenda-text">
+                  <h4>The Problem & Solution</h4>
+                  <p>Why spreadsheets fail and how automated tracking prevents lost gadgets.</p>
+                </div>
+              </div>
+
+              <div class="cover-agenda-item">
+                <div class="cover-agenda-num">02</div>
+                <div class="cover-agenda-text">
+                  <h4>OOP Architecture & Blueprint</h4>
+                  <p>Parent <code>Device</code> class and child <code>Laptop</code> / <code>Phone</code> inheritance.</p>
+                </div>
+              </div>
+
+              <div class="cover-agenda-item">
+                <div class="cover-agenda-num">03</div>
+                <div class="cover-agenda-text">
+                  <h4>Interactive UML Class Diagram</h4>
+                  <p>Standard UML 2.5 visual schematics with animated inheritance flow.</p>
+                </div>
+              </div>
+
+              <div class="cover-agenda-item">
+                <div class="cover-agenda-num">04</div>
+                <div class="cover-agenda-text">
+                  <h4>Multi-Office & Currency Math</h4>
+                  <p>Seamless conversion between USD, SEK (Malmö @ 10.5x), and EUR.</p>
+                </div>
+              </div>
+
+              <div class="cover-agenda-item">
+                <div class="cover-agenda-num">05</div>
+                <div class="cover-agenda-text">
+                  <h4>3-Year Traffic Light & Live Code</h4>
+                  <p>Depreciation lifecycle alerts + complete compiling .NET 10 source code.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- SLIDE 2: The Problem & The Solution                                  -->
+        <!-- ==================================================================== -->
+        <section class="slide" data-slide="2">
+          <div class="slide-tag">
+            <span style="display:inline-block; width:6px; height:6px; background:#06b6d4; border-radius:50%;"></span>
+            01. The Problem & The Solution
+          </div>
+          <h1 class="slide-title">Where Did All the Laptops Go?!</h1>
+          <p class="slide-subtitle">A super-simple C# tracking app built for Lexicon Malmö that keeps an eye on every laptop and phone automatically.</p>
+
+          <div class="eli5-box">
+            <div class="eli5-icon">💡</div>
+            <div class="eli5-content">
+              <strong>ELI5 Analogy: The Global Toybox</strong>
+              <p>Imagine our school and company lend out hundreds of gadgets across Malmö, Stockholm, and New York. Without a clear list, nobody knows who has what, how old they are, or how much they cost!</p>
+            </div>
+          </div>
+
+          <div class="slide-1-grid">
+            <div class="glass-panel" style="padding: 20px;">
+              <h3 style="font-size:16px; margin-bottom:14px; color:#fff;">Key Takeaways (In Plain English)</h3>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <div class="icon" style="background:rgba(6, 182, 212, 0.15); color:#06b6d4;">📍</div>
+                  <div>
+                    <h4>Never Lose a Device</h4>
+                    <p>Every laptop and phone is tagged with an owner's name and office. No more missing gear!</p>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="icon" style="background:rgba(16, 185, 129, 0.15); color:#10b981;">💱</div>
+                  <div>
+                    <h4>No Calculator Needed</h4>
+                    <p>Prices convert into Swedish Kronor (SEK), Euros (€), or Dollars ($) automatically.</p>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="icon" style="background:rgba(244, 63, 94, 0.15); color:#f43f5e;">🚦</div>
+                  <div>
+                    <h4>Tech Traffic Light</h4>
+                    <p>Green when fresh, Yellow when aging, and Red when 3 years old and ready for an upgrade.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-panel" style="padding: 20px;">
+              <div class="sim-toggle-bar">
+                <button class="sim-toggle-btn active chaos" id="btnSimChaos">
+                  <span>💥</span> Before: Chaos (Lost Gear)
+                </button>
+                <button class="sim-toggle-btn" id="btnSimTracked">
+                  <span>✨</span> After: Lexicon GearKeeper
+                </button>
+              </div>
+
+              <div class="sim-stage" id="slide1SimStage">
+                <!-- Chaos state elements rendered here by JS -->
+              </div>
+              <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <span id="simStatusText" style="font-size: 11.5px; color: #94a3b8;">15 Lost Devices • Unknown Costs • No Records</span>
+                <button id="btnAddSampleDevice" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
+                  + Add New Device
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- SLIDE 3: OOP & Inheritance (The Family Tree)                         -->
+        <!-- ==================================================================== -->
+        <section class="slide" data-slide="3">
+          <div class="slide-tag">
+            <span style="display:inline-block; width:6px; height:6px; background:#8b5cf6; border-radius:50%;"></span>
+            02. Code Architecture
+          </div>
+          <h1 class="slide-title">Parent & Child: Meet the Blueprint</h1>
+          <p class="slide-subtitle">How Object-Oriented Programming (OOP) eliminates messy copy-paste code.</p>
+
+          <div class="eli5-box">
+            <div class="eli5-icon">🧬</div>
+            <div class="eli5-content">
+              <strong>ELI5 Analogy: The Vehicle Family Tree</strong>
+              <p>Just like a "Vehicle" can be a car or a motorcycle, in our code a <strong>Device</strong> is the parent blueprint. A <strong>Laptop</strong> and a <strong>Phone</strong> are just kids that inherit everything from the parent for free!</p>
+            </div>
+          </div>
+
+          <div class="slide-2-container">
+            <!-- Left: Interactive Tree Diagram -->
+            <div class="glass-panel tree-interactive-box">
+              <div class="tree-card selected" id="cardBaseDevice" data-target="device">
+                <div class="tree-card-header">
+                  <span class="tree-card-title">class Device</span>
+                  <span class="badge-role badge-parent">Base Parent</span>
+                </div>
+                <p class="tree-card-desc">The universal blueprint: Model, PriceUSD, PurchaseDate, and Office location.</p>
+              </div>
+
+              <div class="tree-lines">
+                <svg viewBox="0 0 300 48" preserveAspectRatio="none">
+                  <path d="M150 0 V24 M150 24 H75 V48 M150 24 H225 V48" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="4,4"></path>
+                </svg>
+              </div>
+
+              <div class="tree-children-row">
+                <div class="tree-card" id="cardChildLaptop" data-target="laptop">
+                  <div class="tree-card-header">
+                    <span class="tree-card-title">class Laptop</span>
+                    <span class="badge-role badge-child">: Device</span>
+                  </div>
+                  <p class="tree-card-desc">+ ScreenSize (Inches), Processor type.</p>
+                </div>
+
+                <div class="tree-card" id="cardChildPhone" data-target="phone">
+                  <div class="tree-card-header">
+                    <span class="tree-card-title">class Phone</span>
+                    <span class="badge-role badge-child">: Device</span>
+                  </div>
+                  <p class="tree-card-desc">+ SimCardNumber, Cellular carrier.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Dynamic Inspector & C# Code -->
+            <div class="glass-panel inspector-panel">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="inspectorTitle" style="font-size:15px; color:#fff; font-family:'JetBrains Mono', monospace;">Device (Base Blueprint)</h3>
+                <span id="inspectorBadge" style="font-size:11px; color:#38bdf8;">Base Class</span>
+              </div>
+
+              <div class="code-snippet-box" id="inspectorCode">
+                <!-- Populated dynamically via JS -->
+              </div>
+
+              <div>
+                <span style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:8px;">
+                  Active Properties in Memory
+                </span>
+                <div class="traits-list" id="inspectorTraits">
+                  <!-- Populated dynamically via JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- SLIDE 4: The Architecture Blueprint: Interactive UML Diagram         -->
+        <!-- ==================================================================== -->
+        <section class="slide" data-slide="4">
+          <div class="slide-tag">
+            <span style="display:inline-block; width:6px; height:6px; background:#06b6d4; border-radius:50%;"></span>
+            03. System Architecture
+          </div>
+          <h1 class="slide-title">The Blueprint Schematics: Interactive UML</h1>
+          <p class="slide-subtitle">Standard UML 2.5 Class Diagram with animated inheritance flow, member visibility, and dynamic dispatch.</p>
+
+          <div class="uml-workbench-window">
+            <!-- Window Top Bar -->
+            <div class="workbench-top-bar">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="term-dots">
+                  <div class="term-dot r"></div>
+                  <div class="term-dot y"></div>
+                  <div class="term-dot g"></div>
+                </div>
+                <span class="term-title">LexiconMalmo.GearKeeper — [UML 2.5 Architecture]</span>
+                <span class="net-badge">UML 2.5</span>
+              </div>
+
+              <!-- Animated Modes -->
+              <div class="workbench-view-tabs">
+                <button class="workbench-view-tab active" id="btnUmlModeInspect" title="Click on classes and members to inspect">🔍 Inspect</button>
+                <button class="workbench-view-tab" id="btnUmlModeInheritance" title="Animate properties flowing down from Device to children">⚡ Inheritance Flow</button>
+                <button class="workbench-view-tab" id="btnUmlModePoly" title="Animate dynamic polymorphic method calls from Program">🔄 Polymorphic Trace</button>
+              </div>
+
+              <!-- Action Controls -->
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button class="btn-ide secondary" id="btnUmlPlayPause" title="Play or pause diagram animation">
+                  <span id="umlPlayIcon">⏸</span>
+                  <span id="umlPlayText">Pause</span>
+                </button>
+                <button class="btn-ide secondary" id="btnUmlReset" title="Reset diagram view">
+                  ↺ Reset
+                </button>
+              </div>
+            </div>
+
+            <!-- Presets Bar -->
+            <div class="ide-presets-bar">
+              <div style="display:flex; align-items:center; gap:6px; overflow-x:auto;">
+                <span style="font-size:10px; color:#94a3b8; text-transform:uppercase; font-weight:700;">Select Node:</span>
+                <button class="preset-chip" id="umlChipDevice">Device (Base)</button>
+                <button class="preset-chip" id="umlChipLaptop">Laptop</button>
+                <button class="preset-chip" id="umlChipPhone">Phone</button>
+                <button class="preset-chip" id="umlChipProgram">Program (Driver)</button>
+              </div>
+
+              <div class="build-pill" id="umlStatusPill">
+                <span class="build-dot" style="background:#06b6d4; box-shadow:0 0 8px #06b6d4;"></span>
+                <span id="umlStatusText" style="color:#67e8f9;">Mode: Interactive Inspector</span>
+              </div>
+            </div>
+
+            <!-- Panes (Left: Visual Canvas with SVG + Class Nodes, Right: Inspector) -->
+            <div class="uml-panes">
+              <!-- Left Visual Stage -->
+              <div class="uml-stage" id="umlStage">
+                <!-- Complete Unified SVG UML Diagram (Pixel-Perfect Alignment Guaranteed) -->
+                <svg class="uml-svg-canvas" viewBox="0 0 540 272" preserveAspectRatio="xMidYMid meet" style="font-family:'JetBrains Mono', monospace;">
+                  <defs>
+                    <pattern id="umlGridDots" width="16" height="16" patternUnits="userSpaceOnUse">
+                      <circle cx="2" cy="2" r="0.8" fill="rgba(255,255,255,0.06)" />
+                    </pattern>
+                  </defs>
+
+                  <rect width="100%" height="100%" fill="url(#umlGridDots)" />
+
+                  <!-- ================= CONNECTION LINES ================= -->
+                  <!-- 1. Dependency dashed line: Program (124, 46) -> Device (166, 46) -->
+                  <path d="M 124,46 H 166" class="uml-conn-line" id="umlDepLine" stroke-dasharray="4 3" />
+                  <polyline points="159,41 166,46 159,51" class="uml-conn-arrow" id="umlDepArrow" fill="none" />
+                  <text x="145" y="39" font-size="8" fill="#38bdf8" text-anchor="middle" font-style="italic">..&gt; uses</text>
+
+                  <!-- 2. Generalization tree: Stem + Trunk to Laptop (112, 186) and Phone (428, 186) -->
+                  <!-- Stem from triangle base (270, 154) to junction (270, 168) -->
+                  <path d="M 270,154 V 168" class="uml-conn-line" id="umlStemLine" />
+
+                  <!-- Trunk & Drops: from Laptop (112, 186) up to (112, 168) -> (428, 168) -> down to Phone (428, 186) -->
+                  <path d="M 112,186 V 168 H 428 V 186" class="uml-conn-line" id="umlTrunkLine" />
+
+                  <!-- Hollow open generalization triangle touching Device bottom (270, 142) -->
+                  <polygon points="270,142 263,154 277,154" class="uml-conn-arrow" id="umlGenTriangle" />
+
+                  <!-- ================= ANIMATED PARTICLES ================= -->
+                  <circle cx="270" cy="148" r="4" class="uml-pulse-dot" id="umlParticle1" style="opacity:0;" />
+                  <circle cx="112" cy="177" r="4" class="uml-pulse-dot" id="umlParticle2" style="opacity:0;" />
+                  <circle cx="428" cy="177" r="4" class="uml-pulse-dot" id="umlParticle3" style="opacity:0;" />
+
+                  <!-- ================= CLASS NODES ================= -->
+
+                  <!-- 1. PROGRAM ENTRY CLASS (Top-Left) -->
+                  <g class="uml-svg-node" id="umlNodeProgram" data-node="program" tabindex="0">
+                    <rect x="12" y="10" width="112" height="72" rx="6" class="node-rect" />
+                    <path d="M 12,10 h 112 v 24 h -112 z" class="node-header-bg" />
+                    <line x1="12" y1="34" x2="124" y2="34" class="node-divider" />
+                    
+                    <text x="68" y="21" text-anchor="middle" font-size="8" font-style="italic" fill="#94a3b8">&lt;&lt;entry&gt;&gt;</text>
+                    <text x="68" y="31" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Program</text>
+                    
+                    <text x="20" y="48" font-size="9" font-weight="700" fill="#34d399">+</text>
+                    <text x="28" y="48" font-size="8.5" fill="#cbd5e1">Main() : void</text>
+                    
+                    <line x1="12" y1="56" x2="124" y2="56" class="node-divider" />
+                    <text x="68" y="69" text-anchor="middle" font-size="8" fill="#38bdf8">..&gt; List&lt;Device&gt;</text>
+                  </g>
+
+                  <!-- 2. DEVICE ABSTRACT BASE CLASS (Top-Center) -->
+                  <g class="uml-svg-node selected" id="umlNodeDevice" data-node="device" tabindex="0">
+                    <rect x="166" y="8" width="208" height="134" rx="6" class="node-rect" />
+                    <path d="M 166,8 h 208 v 26 h -208 z" class="node-header-bg" />
+                    <line x1="166" y1="34" x2="374" y2="34" class="node-divider" />
+                    
+                    <text x="270" y="20" text-anchor="middle" font-size="8.5" font-style="italic" fill="#94a3b8">&lt;&lt;abstract&gt;&gt;</text>
+                    <text x="270" y="31" text-anchor="middle" font-size="12" font-weight="700" font-style="italic" fill="#38bdf8">Device</text>
+                    
+                    <!-- Attributes Compartment -->
+                    <text x="176" y="47" font-size="8.5" font-weight="700" fill="#34d399">+</text>
+                    <text x="185" y="47" font-size="8.5" fill="#cbd5e1">Model : string</text>
+                    
+                    <text x="176" y="59" font-size="8.5" font-weight="700" fill="#34d399">+</text>
+                    <text x="185" y="59" font-size="8.5" fill="#cbd5e1">PriceUSD : decimal</text>
+                    
+                    <text x="176" y="71" font-size="8.5" font-weight="700" fill="#34d399">+</text>
+                    <text x="185" y="71" font-size="8.5" fill="#cbd5e1">PurchaseDate : DateTime</text>
+                    
+                    <text x="176" y="83" font-size="8.5" font-weight="700" fill="#34d399">+</text>
+                    <text x="185" y="83" font-size="8.5" fill="#cbd5e1">Office : string</text>
+                    
+                    <!-- Operations Compartment -->
+                    <line x1="166" y1="89" x2="374" y2="89" class="node-divider" />
+                    
+                    <text x="176" y="102" font-size="8" font-weight="700" fill="#34d399">+</text>
+                    <text x="185" y="102" font-size="8" fill="#cbd5e1">GetPriceInLocal() : decimal</text>
+                    
+                    <text x="176" y="115" font-size="8" font-weight="700" fill="#34d399">+</text>
+                    <text x="185" y="115" font-size="8.5" fill="#cbd5e1">GetCurrencySymbol() : string</text>
+                    
+                    <text x="176" y="128" font-size="8" font-weight="700" fill="#34d399">+</text>
+                    <text x="185" y="128" font-size="8.5" fill="#cbd5e1">GetStatus(today) : (Color, str)</text>
+                  </g>
+
+                  <!-- 3. LAPTOP CHILD CLASS (Bottom-Left) -->
+                  <g class="uml-svg-node" id="umlNodeLaptop" data-node="laptop" tabindex="0">
+                    <rect x="28" y="186" width="168" height="76" rx="6" class="node-rect" />
+                    <path d="M 28,186 h 168 v 24 h -168 z" class="node-header-bg" />
+                    <line x1="28" y1="210" x2="196" y2="210" class="node-divider" />
+                    
+                    <text x="112" y="197" text-anchor="middle" font-size="8" font-style="italic" fill="#94a3b8">: Device</text>
+                    <text x="112" y="207" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Laptop</text>
+                    
+                    <!-- Laptop Attributes -->
+                    <text x="36" y="224" font-size="8.5" font-weight="700" fill="#34d399">+</text>
+                    <text x="45" y="224" font-size="8.5" fill="#cbd5e1">ScreenSizeInches : double</text>
+                    
+                    <line x1="28" y1="232" x2="196" y2="232" class="node-divider" />
+                    <text x="112" y="248" text-anchor="middle" font-size="8" fill="#c4b5fd">↑ inherits 4 props + 3 methods</text>
+                  </g>
+
+                  <!-- 4. PHONE CHILD CLASS (Bottom-Right) -->
+                  <g class="uml-svg-node" id="umlNodePhone" data-node="phone" tabindex="0">
+                    <rect x="344" y="186" width="168" height="76" rx="6" class="node-rect" />
+                    <path d="M 344,186 h 168 v 24 h -168 z" class="node-header-bg" />
+                    <line x1="344" y1="210" x2="512" y2="210" class="node-divider" />
+                    
+                    <text x="428" y="197" text-anchor="middle" font-size="8" font-style="italic" fill="#94a3b8">: Device</text>
+                    <text x="428" y="207" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Phone</text>
+                    
+                    <!-- Phone Attributes -->
+                    <text x="352" y="224" font-size="8.5" font-weight="700" fill="#34d399">+</text>
+                    <text x="361" y="224" font-size="8.5" fill="#cbd5e1">SimCardNumber : string</text>
+                    
+                    <line x1="344" y1="232" x2="512" y2="232" class="node-divider" />
+                    <text x="428" y="248" text-anchor="middle" font-size="8" fill="#c4b5fd">↑ inherits 4 props + 3 methods</text>
+                  </g>
+                </svg>
+              </div>
+
+              <!-- Right Inspector Pane -->
+              <div class="uml-inspector-pane" id="umlInspectorPane">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <h4 style="font-size:13px; color:#fff; font-family:'JetBrains Mono';" id="umlInspectorTitle">abstract class Device</h4>
+                  <span class="uml-badge-chip" id="umlInspectorBadge" style="background:rgba(6,182,212,0.15); color:#67e8f9; border:1px solid rgba(6,182,212,0.3); font-size:10px; padding:2px 7px; border-radius:4px;">
+                    Base Abstract Class
+                  </span>
+                </div>
+
+                <p style="font-size:11px; color:var(--text-secondary); line-height:1.35; margin:0;" id="umlInspectorDesc">
+                  The foundational blueprint defining all universal fields (Model, PriceUSD, PurchaseDate, Office) and virtual methods.
+                </p>
+
+                <!-- Members Breakdown -->
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 9px;">
+                  <span style="font-size:9.5px; font-weight:700; color:#94a3b8; text-transform:uppercase; display:block; margin-bottom:3px; letter-spacing:0.04em;">
+                    UML Compartments & Modifiers
+                  </span>
+                  <div id="umlInspectorMembers" style="font-family:'JetBrains Mono'; font-size:10px; color:#cbd5e1; line-height:1.45; display:flex; flex-direction:column; gap:2px;">
+                    <!-- Populated dynamically via JS -->
+                  </div>
+                </div>
+
+                <!-- Interactive Test Button -->
+                <div style="margin-top:auto; padding-top:4px;">
+                  <button id="btnUmlTestDispatch" class="btn-ide run" style="width:100%; justify-content:center; padding:5px 10px; font-size:11px; font-family:'JetBrains Mono';">
+                    ⚡ Test Polymorphic Method Call
+                  </button>
+                  <div id="umlDispatchOutput" style="margin-top:4px; font-family:'JetBrains Mono'; font-size:10px; color:#34d399; min-height:14px; line-height:1.3;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terminal Status Bar / Legend -->
+            <div style="background:#090d16; padding:6px 14px; border-top:1px solid rgba(255,255,255,0.06); font-family:'JetBrains Mono'; font-size:10.5px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="color:#64748b;">Legend: <span style="color:#38bdf8;">△ Hollow Arrow = Inheritance</span> · <span style="color:#cbd5e1;">⇢ Dashed = Dependency</span> · <span style="color:#34d399;">+ Public</span></span>
+              <span style="color:#a855f7;">UML 2.5 Architecture Spec</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- SLIDE 5: Multi-Office & Magic Currency                               -->
+        <!-- ==================================================================== -->
+        <section class="slide" data-slide="5">
+          <div class="slide-tag">
+            <span style="display:inline-block; width:6px; height:6px; background:#10b981; border-radius:50%;"></span>
+            04. Multi-Office & Rates
+          </div>
+          <h1 class="slide-title">Shopping Across the World</h1>
+          <p class="slide-subtitle">Multi-currency conversions handled seamlessly in one unified C# data model.</p>
+
+          <div class="eli5-box">
+            <div class="eli5-icon">🌍</div>
+            <div class="eli5-content">
+              <strong>ELI5 Analogy: The Magic Pocket Calculator</strong>
+              <p>A laptop costs SEK in Malmö, USD in New York, and EUR in Madrid. You don't need a calculator; the code does the math instantly!</p>
+            </div>
+          </div>
+
+          <div class="slide-3-grid">
+            <!-- Left: Interactive Currency Widget -->
+            <div class="glass-panel currency-calculator-card">
+              <div>
+                <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); display:block; margin-bottom:8px;">
+                  Select Target Office
+                </span>
+                <div class="office-selector-tabs">
+                  <button class="office-btn active" data-office="Sweden" data-rate="10.50" data-sym="kr" data-curr="SEK">
+                    <span class="office-flag">🇸🇪</span>
+                    <span class="office-name">Sweden (Malmö)</span>
+                    <span class="office-curr">SEK (10.5x)</span>
+                  </button>
+                  <button class="office-btn" data-office="USA" data-rate="1.00" data-sym="$" data-curr="USD">
+                    <span class="office-flag">🇺🇸</span>
+                    <span class="office-name">USA</span>
+                    <span class="office-curr">USD ($)</span>
+                  </button>
+                  <button class="office-btn" data-office="Spain" data-rate="0.92" data-sym="€" data-curr="EUR">
+                    <span class="office-flag">🇪🇸</span>
+                    <span class="office-name">Spain</span>
+                    <span class="office-curr">EUR (0.92x)</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="amount-control">
+                <div class="amount-header">
+                  <span>Base Purchase Price (USD)</span>
+                  <span id="sliderPriceLabel" style="font-weight:700; color:#fff; font-family:'JetBrains Mono', monospace;">$1,000 USD</span>
+                </div>
+                <input type="range" class="slider-input" id="priceRangeSlider" min="200" max="4000" step="50" value="1000" />
+              </div>
+
+              <div class="price-hero-box">
+                <div class="price-hero-label" id="priceHeroOffice">Sweden (Malmö) Office Localized Cost</div>
+                <div class="price-hero-val" id="priceHeroValue">$1,000.00</div>
+                <div class="price-conversion-formula" id="priceHeroFormula">$1,000.00 × 1.00 = $1,000.00 USD</div>
+              </div>
+            </div>
+
+            <!-- Right: Code and Real-World Table -->
+            <div class="glass-panel" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+              <h3 style="font-size: 15px; color:#fff;">How the C# Code Does It</h3>
+              <div class="code-snippet-box">
+<span class="c-kw">public decimal</span> <span class="c-type">GetPriceInLocalCurrency</span>()
+{
+    <span class="c-kw">return</span> Office <span class="c-kw">switch</span>
+    {
+        <span class="c-str">"USA"</span>    =&gt; PriceUSD * <span class="c-num">1.00m</span>,
+        <span class="c-str">"Sweden"</span> =&gt; PriceUSD * <span class="c-num">10.50m</span>,
+        <span class="c-str">"Spain"</span>  =&gt; PriceUSD * <span class="c-num">0.92m</span>,
+        _ =&gt; PriceUSD
+    };
+}
+              </div>
+
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="font-size:11px; color:#94a3b8; margin-bottom:8px; font-weight:600;">Global Inventory Sample Conversion:</div>
+                <div style="font-size:11.5px; display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                  <span>MacBook Pro 16"</span>
+                  <span id="rowPriceMac" style="font-family:'JetBrains Mono'; font-weight:600; color:#38bdf8;">$2,400.00</span>
+                </div>
+                <div style="font-size:11.5px; display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                  <span>iPhone 15 Pro</span>
+                  <span id="rowPriceIPhone" style="font-family:'JetBrains Mono'; font-weight:600; color:#38bdf8;">$1,100.00</span>
+                </div>
+                <div style="font-size:11.5px; display:flex; justify-content:space-between; padding:4px 0;">
+                  <span>Dell UltraSharp 32"</span>
+                  <span id="rowPriceDell" style="font-family:'JetBrains Mono'; font-weight:600; color:#38bdf8;">$650.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- SLIDE 6: The 3-Year "Traffic Light" Rule                             -->
+        <!-- ==================================================================== -->
+        <section class="slide" data-slide="6">
+          <div class="slide-tag">
+            <span style="display:inline-block; width:6px; height:6px; background:#f59e0b; border-radius:50%;"></span>
+            05. Device Lifecycle
+          </div>
+          <h1 class="slide-title">The Gadget Expiration Date</h1>
+          <p class="slide-subtitle">The 3-Year Traffic Light Rule: Keeping hardware fresh and preventing sudden failures.</p>
+
+          <div class="eli5-box">
+            <div class="eli5-icon">🥛</div>
+            <div class="eli5-content">
+              <strong>ELI5 Analogy: Tech Ages Just Like Milk!</strong>
+              <p>Every gadget has a 3-year lifespan. <strong>Green</strong> has plenty of time left. <strong>Yellow</strong> has less than 3 months left (budget time!). <strong>Red</strong> is 3+ years old — obsolete, replace immediately!</p>
+            </div>
+          </div>
+
+          <div class="slide-4-container">
+            <!-- Left: Animated Traffic Light Rig -->
+            <div class="traffic-light-rig">
+              <div class="traffic-light-housing">
+                <div class="light-bulb red" id="lightRed"></div>
+                <div class="light-bulb yellow" id="lightYellow"></div>
+                <div class="light-bulb green active" id="lightGreen"></div>
+              </div>
+
+              <div class="device-preview-card status-green" id="deviceStatusCard">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                  <div>
+                    <h4 style="font-size:16px; color:#fff;" id="statusDeviceName">Lenovo ThinkPad X1</h4>
+                    <span style="font-size:12px; color:var(--text-secondary);" id="statusDeviceDate">Purchased: 12 months ago</span>
+                  </div>
+                  <span class="status-pill pill-green" id="statusPillText">🟢 Fresh</span>
+                </div>
+
+                <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0;"></div>
+
+                <div style="font-size: 12px; line-height: 1.45;">
+                  <span style="color:var(--text-muted); display:block;">Action Required:</span>
+                  <strong style="color:#fff;" id="statusActionText">Device is healthy. No budget action needed.</strong>
+                </div>
+
+                <div style="font-size: 11px; font-family:'JetBrains Mono'; color:#38bdf8;" id="statusRemainingDays">
+                  730 days remaining in 3-year lifecycle
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Interactive Lifespan Slider & Logic -->
+            <div class="glass-panel slider-control-card">
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                  <span style="font-size:12px; font-weight:700; color:#fff;">Drag Device Age (Months)</span>
+                  <span id="ageSliderLabel" style="font-family:'JetBrains Mono'; font-weight:700; color:var(--accent-cyan); font-size:14px;">12 Months Old</span>
+                </div>
+                <input type="range" class="slider-input" id="lifespanSlider" min="0" max="42" step="1" value="12" />
+                <div class="slider-ticks" style="margin-top:6px;">
+                  <span>0 mo (New)</span>
+                  <span>24 mo (2 yrs)</span>
+                  <span style="color:#f59e0b;">33 mo (Warning)</span>
+                  <span style="color:#ef4444;">36+ mo (Expired)</span>
+                </div>
+              </div>
+
+              <div class="code-snippet-box">
+<span class="c-com">// C# Expiration Calculation</span>
+<span class="c-type">TimeSpan</span> age = <span class="c-type">DateTime</span>.Today - PurchaseDate;
+<span class="c-type">TimeSpan</span> threeYears = <span class="c-type">TimeSpan</span>.FromDays(<span class="c-num">365 * 3</span>);
+
+<span class="c-kw">if</span> (age &gt;= threeYears)
+    <span class="c-type">Console</span>.ForegroundColor = <span class="c-type">ConsoleColor</span>.<span class="c-var" style="color:#ef4444;">Red</span>;
+<span class="c-kw">else if</span> (age &gt;= threeYears - <span class="c-type">TimeSpan</span>.FromDays(<span class="c-num">90</span>))
+    <span class="c-type">Console</span>.ForegroundColor = <span class="c-type">ConsoleColor</span>.<span class="c-var" style="color:#f59e0b;">Yellow</span>;
+<span class="c-kw">else</span>
+    <span class="c-type">Console</span>.ForegroundColor = <span class="c-type">ConsoleColor</span>.<span class="c-var" style="color:#10b981;">Green</span>;
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- SLIDE 7: The System in Action & Summary                              -->
+        <!-- ==================================================================== -->
+        <section class="slide" data-slide="7">
+          <div class="slide-tag">
+            <span style="display:inline-block; width:6px; height:6px; background:#06b6d4; border-radius:50%;"></span>
+            06. Execution & Summary
+          </div>
+          <h1 class="slide-title">Organized & In Control</h1>
+          <p class="slide-subtitle">A clean C# console application that gives management crystal-clear oversight in seconds.</p>
+
+          <div class="slide-5-grid">
+            <!-- Left: Simulated C# Terminal Window -->
+            <div class="terminal-window">
+              <div class="terminal-header">
+                <div class="term-dots">
+                  <div class="term-dot r"></div>
+                  <div class="term-dot y"></div>
+                  <div class="term-dot g"></div>
+                </div>
+                <span class="term-title">LexiconMalmo.GearKeeper.exe — [Console Output]</span>
+                <div style="display:flex; gap:6px;">
+                  <button id="btnTermSortOffice" style="background:rgba(255,255,255,0.06); border:none; color:#cbd5e1; font-size:10px; padding:2px 8px; border-radius:4px; cursor:pointer;">
+                    Sort: Office
+                  </button>
+                  <button id="btnTermSortAge" style="background:rgba(255,255,255,0.06); border:none; color:#cbd5e1; font-size:10px; padding:2px 8px; border-radius:4px; cursor:pointer;">
+                    Sort: Date
+                  </button>
+                </div>
+              </div>
+
+              <div class="term-body" id="termBody">
+                <table class="term-table">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Model</th>
+                      <th>Office</th>
+                      <th>Purchase Date</th>
+                      <th>Price USD</th>
+                      <th>Local Currency</th>
+                    </tr>
+                  </thead>
+                  <tbody id="termTableBody">
+                    <!-- Populated dynamically via JS -->
+                  </tbody>
+                </table>
+              </div>
+
+              <div style="background:#0c121e; padding:8px 14px; border-top:1px solid rgba(255,255,255,0.05); font-family:'JetBrains Mono'; font-size:11px; display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:#64748b;">Legend: <span style="color:#f87171;">■ Expired (&gt;3y)</span> · <span style="color:#fbbf24;">■ Warning (&lt;3mo)</span> · <span style="color:#86efac;">■ Fresh</span></span>
+                <span style="color:#38bdf8;">Total Devices: <span id="termTotalCount">7</span></span>
+              </div>
+            </div>
+
+            <!-- Right: Pitch Summary & Q&A Callout -->
+            <div class="summary-cards-col">
+              <div class="summary-bullet-card">
+                <div class="summary-bullet-icon">1</div>
+                <div>
+                  <h4 style="font-size:13.5px; color:#fff; margin-bottom:3px;">Inheritance & OOP</h4>
+                  <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
+                    One clean base class provides core properties, letting child devices specialize without duplicate code.
+                  </p>
+                </div>
+              </div>
+
+              <div class="summary-bullet-card">
+                <div class="summary-bullet-icon">2</div>
+                <div>
+                  <h4 style="font-size:13.5px; color:#fff; margin-bottom:3px;">Global Financial Accuracy</h4>
+                  <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
+                    Instant conversion to EUR and SEK so regional branch managers see their true budget numbers.
+                  </p>
+                </div>
+              </div>
+
+              <div class="summary-bullet-card">
+                <div class="summary-bullet-icon">3</div>
+                <div>
+                  <h4 style="font-size:13.5px; color:#fff; margin-bottom:3px;">Proactive Traffic Light</h4>
+                  <p style="font-size:12px; color:var(--text-secondary); line-height:1.4;">
+                    Red and yellow alerts ensure machines get replaced before hardware crashes disrupt business.
+                  </p>
+                </div>
+              </div>
+
+              <div class="glass-panel" style="padding:16px; text-align:center; background:linear-gradient(135deg, rgba(6,182,212,0.1) 0%, rgba(139,92,246,0.1) 100%);">
+                <h4 style="font-size:15px; color:#fff; margin-bottom:4px;">Ready for Code Walkthrough! 💻</h4>
+                <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">Show your classmates the full, compiling .NET 10 source code.</p>
+                <div style="display:flex; gap:8px; justify-content:center;">
+                  <button id="btnRestartDeck" class="btn-nav" style="padding:6px 12px; font-size:11.5px;">
+                    ↺ Restart
+                  </button>
+                  <button id="btnGoToSlide8" class="btn-nav primary" style="padding:6px 14px; font-size:11.5px;">
+                    View .NET 10 Code ➔
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- SLIDE 8: .NET 10 C# Live Codebase & Sandbox                           -->
+        <!-- ==================================================================== -->
+        <section class="slide" data-slide="8">
+          <div class="slide-tag">
+            <span style="display:inline-block; width:6px; height:6px; background:#a855f7; border-radius:50%;"></span>
+            07. .NET 10 C# Source Code
+          </div>
+          <h1 class="slide-title">The Complete C# Program</h1>
+          <p class="slide-subtitle">Full, scrollable .NET 10 codebase. Tweak properties or exchange rates, then click "Run" to test changes live.</p>
+
+          <div class="csharp-workbench-window">
+            <!-- Header bar with window dots, title, view switcher tabs, and run button -->
+            <div class="workbench-top-bar">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="term-dots">
+                  <div class="term-dot r"></div>
+                  <div class="term-dot y"></div>
+                  <div class="term-dot g"></div>
+                </div>
+                <span class="term-title">LexiconMalmo.GearKeeper.NET10 — C# Source & Runtime</span>
+                <span class="net-badge">.NET 10.0</span>
+              </div>
+
+              <!-- View Switcher Tabs -->
+              <div class="workbench-view-tabs">
+                <button class="workbench-view-tab active" id="tabModeSplit" title="Side-by-side code and console">⇄ Split View</button>
+                <button class="workbench-view-tab" id="tabModeCode" title="Full-width code editor">💻 Program.cs</button>
+                <button class="workbench-view-tab" id="tabModeConsole" title="Full-width console output">⚡ Console</button>
+              </div>
+
+              <!-- Quick action buttons -->
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button class="btn-ide secondary" id="btnCopyCode" title="Copy full C# code to clipboard">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span>Copy</span>
+                </button>
+                <button class="btn-ide secondary" id="btnResetCode" title="Reset code to default">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                  <span>Reset</span>
+                </button>
+                <button class="btn-ide run" id="btnRunCode" title="Compile and Execute with .NET 10">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                  <span>Run / Recompile</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Clean Presets & Device Catalog Bar -->
+            <div class="ide-presets-bar">
+              <!-- Location Selector -->
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:10.5px; color:#94a3b8; text-transform:uppercase; font-weight:700;">Office:</span>
+                <div class="location-toggle-group" id="locationToggleGroup">
+                  <button class="loc-btn active" data-loc="Sweden">🇸🇪 Sweden</button>
+                  <button class="loc-btn" data-loc="USA">🇺🇸 USA</button>
+                  <button class="loc-btn" data-loc="Spain">🇪🇸 Spain</button>
+                </div>
+              </div>
+
+              <!-- Exactly 4 Clean Device Presets: 2 Phones, 2 Laptops -->
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:10.5px; color:#94a3b8; text-transform:uppercase; font-weight:700;">Add:</span>
+                <button class="preset-chip phone" id="btnAddIPhone15" title="Add iPhone 15 Pro">📱 + iPhone 15 ($999)</button>
+                <button class="preset-chip phone" id="btnAddGalaxyS24" title="Add Samsung Galaxy S24">📱 + Galaxy S24 ($899)</button>
+                <button class="preset-chip laptop" id="btnAddMacBook" title="Add MacBook Pro 14">💻 + MacBook ($1,999)</button>
+                <button class="preset-chip laptop" id="btnAddThinkPad" title="Add Lenovo ThinkPad">💻 + ThinkPad ($1,499)</button>
+                <button class="preset-chip" id="presetDefault" style="color:#94a3b8;">↺ Reset</button>
+              </div>
+
+              <div class="build-pill" id="buildStatusPill">
+                <span class="build-dot"></span>
+                <span id="buildStatusText">Build Succeeded • .NET 10.0</span>
+              </div>
+            </div>
+
+            <!-- Interactive LINQ Filter & Sort Bar (Where & OrderBy) -->
+            <div class="linq-filter-bar">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:10px; color:#38bdf8; font-weight:700; font-family:'JetBrains Mono';">Filter:</span>
+                <button class="linq-btn active" data-linq-filter="all">All Offices</button>
+                <button class="linq-btn" data-linq-filter="Spain">🇪🇸 Spain</button>
+                <button class="linq-btn" data-linq-filter="Sweden">🇸🇪 Sweden</button>
+                <button class="linq-btn" data-linq-filter="USA">🇺🇸 USA</button>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:10px; color:#c084fc; font-weight:700; font-family:'JetBrains Mono';">Sort:</span>
+                <button class="linq-sort-btn active" data-linq-sort="office-date">Office ➔ Date</button>
+                <button class="linq-sort-btn" data-linq-sort="date-asc">Date (Oldest First)</button>
+                <button class="linq-sort-btn" data-linq-sort="date-desc">Date (Newest First)</button>
+                <button class="linq-sort-btn" data-linq-sort="price-desc">Price (High ➔ Low)</button>
+              </div>
+            </div>
+
+            <!-- Panes container -->
+            <div class="workbench-panes" id="workbenchPanes">
+              <!-- Code Editor Pane -->
+              <div class="workbench-code-pane" id="workbenchCodePane">
+                <div class="line-gutter" id="lineGutter"></div>
+                <textarea class="code-textarea" id="codeEditorArea" spellcheck="false"></textarea>
+              </div>
+
+              <!-- Console Output Pane -->
+              <div class="workbench-console-pane" id="workbenchConsolePane">
+                <table class="term-table">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Model</th>
+                      <th>Office</th>
+                      <th>Purchase Date</th>
+                      <th>Price USD</th>
+                      <th>Local Currency</th>
+                    </tr>
+                  </thead>
+                  <tbody id="slide6TableBody">
+                    <!-- Populated dynamically via live C# interpreter -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Terminal Status Bar -->
+            <div style="background:#090d16; padding:6px 14px; border-top:1px solid rgba(255,255,255,0.06); font-family:'JetBrains Mono'; font-size:10.5px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="color:#64748b;">Legend: <span style="color:#f87171;">■ Expired (&gt;3y)</span> · <span style="color:#fbbf24;">■ Warning (&lt;3mo)</span> · <span style="color:#86efac;">■ Fresh</span></span>
+              <span style="color:#38bdf8;">Devices: <span id="slide6CountBadge">7</span> • Total: <span id="slide6TotalUSD" style="color:#fff;">$9,948</span> • Lines: <span id="codeLineCount" style="color:#cbd5e1;">124</span></span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- BOTTOM CONTROL BAR -->
+      <footer class="deck-footer">
+        <div class="nav-dots" id="navDotsContainer">
+          <button class="nav-dot-btn active" data-slide="1">
+            <span class="indicator"></span>
+            <span>1. Intro</span>
+          </button>
+          <button class="nav-dot-btn" data-slide="2">
+            <span class="indicator"></span>
+            <span>2. Problem</span>
+          </button>
+          <button class="nav-dot-btn" data-slide="3">
+            <span class="indicator"></span>
+            <span>3. Blueprint</span>
+          </button>
+          <button class="nav-dot-btn" data-slide="4">
+            <span class="indicator"></span>
+            <span>4. UML Model</span>
+          </button>
+          <button class="nav-dot-btn" data-slide="5">
+            <span class="indicator"></span>
+            <span>5. Multi-Office</span>
+          </button>
+          <button class="nav-dot-btn" data-slide="6">
+            <span class="indicator"></span>
+            <span>6. Traffic Light</span>
+          </button>
+          <button class="nav-dot-btn" data-slide="7">
+            <span class="indicator"></span>
+            <span>7. Summary</span>
+          </button>
+          <button class="nav-dot-btn" data-slide="8">
+            <span class="indicator"></span>
+            <span>8. .NET 10 Code</span>
+          </button>
+        </div>
+
+        <div class="nav-controls">
+          <div class="nav-hint">
+            <span class="key-kbd">←</span>
+            <span class="key-kbd">→</span>
+            <span class="key-kbd">Space</span>
+          </div>
+
+          <button class="btn-nav" id="btnPrev" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Prev
+          </button>
+          <button class="btn-nav primary" id="btnNext">
+            Next
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    <!-- PRESENTER NOTES MODAL -->
+    <div class="modal-backdrop" id="notesModal">
+      <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="font-size:16px; color:#fff;" id="notesTitle">Slide 1 Presenter Notes</h3>
+          <button class="btn-icon" id="btnCloseNotes" style="width:30px; height:30px;">✕</button>
+        </div>
+        <div id="notesBody" style="font-size:13.5px; line-height:1.6; color:#cbd5e1;">
+          <!-- Populated by JS for each slide -->
+        </div>
+        <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-muted);">
+          <span>Shortcut: Press <kbd class="key-kbd">P</kbd> or <kbd class="key-kbd">Esc</kbd></span>
+          <span>Recommended presentation pace: 45-60s per slide</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast-msg" id="toastMsg">
+      <span>✅</span>
+      <span id="toastText">C# Code Copied to Clipboard!</span>
+    </div>
+
+    <!-- APPLICATION SCRIPTS (Self-Contained Vanilla JavaScript) -->
+    <script>
+      (function () {
+        'use strict';
+
+        // --- STATE MANAGEMENT ---
+        let currentSlide = 1;
+        const totalSlides = 8;
+        let soundEnabled = true;
+
+        // --- AUDIO SYNTHESIZER (Web Audio API - No External Files) ---
+        let audioCtx = null;
+        function playTone(freq, type = 'sine', duration = 0.08, volume = 0.1) {
+          if (!soundEnabled) return;
+          try {
+            if (!audioCtx) {
+              const AudioContext = window.AudioContext || window.webkitAudioContext;
+              if (AudioContext) audioCtx = new AudioContext();
+            }
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+          } catch (e) {
+            // Audio policy or unsupported
+          }
+        }
+
+        // --- PRESENTER TIMER ---
+        let timerSeconds = 0;
+        let timerInterval = null;
+        function startTimer() {
+          timerInterval = setInterval(() => {
+            timerSeconds++;
+            const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+            const secs = String(timerSeconds % 60).padStart(2, '0');
+            const el = document.getElementById('pitchTimerText');
+            if (el) el.textContent = `${mins}:${secs}`;
+          }, 1000);
+        }
+        startTimer();
+
+        // --- PRESENTER NOTES DATA ---
+        const presenterNotes = {
+          1: `<strong>Minute 00:00 - 00:30 | Title & Intro</strong>
+              <p style="margin-top:8px;">• Introduce yourself: "Hello everyone, my name is [Your Name], and today I am presenting <strong>Lexicon GearKeeper</strong>, built in .NET 10 / C# 14 for our Lexicon Malmö developer course."</p>
+              <p style="margin-top:6px;">• Briefly outline the 5-minute agenda: The Problem, OOP Architecture, UML Schematics, Multi-Currency Math, and the 3-Year Lifecycle Rule.</p>
+              <p style="margin-top:6px;">• Click "Start Presentation" to begin!</p>`,
+          2: `<strong>Minute 00:30 - 01:15 | Hook & Problem</strong>
+              <p style="margin-top:8px;">• Start with the hook: "How many of you know exactly what laptops your company is using and how old they are right now?"</p>
+              <p style="margin-top:6px;">• Explain the chaos: Devices scattered across Malmö, Stockholm, and New York. Spreadsheets get out of date, devices get lost, and budgets get blown.</p>
+              <p style="margin-top:6px;">• Click "Before: Chaos" vs "After: Lexicon GearKeeper" to show how automated tracking organizes the entire fleet by location and owner.</p>`,
+          3: `<strong>Minute 01:15 - 02:00 | OOP & Inheritance (The Family Tree)</strong>
+              <p style="margin-top:8px;">• Use the baby-term analogy: "A <code>Device</code> is the parent blueprint. A <code>Laptop</code> and a <code>Phone</code> are kids that inherit everything for free without copy-pasting code."</p>
+              <p style="margin-top:6px;">• Click on the cards to show how <code>class Laptop : Device</code> shares <code>Model</code>, <code>PriceUSD</code>, <code>PurchaseDate</code>, and <code>Office</code> automatically.</p>
+              <p style="margin-top:6px;">• Highlight child-specific properties (Screen Size vs SIM card number).</p>`,
+          4: `<strong>Minute 02:00 - 02:45 | Software Architecture & Interactive UML</strong>
+              <p style="margin-top:8px;">• Walk your audience through the formal UML 2.5 class diagram.</p>
+              <p style="margin-top:6px;">• Point out the standard hollow triangle (<|--) representing inheritance (generalization).</p>
+              <p style="margin-top:6px;">• Click "Inheritance Flow" to animate properties streaming from <code><<abstract>> Device</code> into child classes.</p>
+              <p style="margin-top:6px;">• Click "Polymorphic Trace" to demonstrate runtime dynamic dispatch when Program calls <code>GetPriceInLocalCurrency()</code>.</p>`,
+          5: `<strong>Minute 02:45 - 03:30 | Multi-Office & Magic Currency</strong>
+              <p style="margin-top:8px;">• Global scale: Why should a Swedish finance lead have to open a browser calculator to convert SEK?</p>
+              <p style="margin-top:6px;">• Interact with the currency tabs on the slide: Click Sweden (10,500 SEK) -> USA ($1,000) -> Spain (920 EUR).</p>
+              <p style="margin-top:6px;">• Highlight the clean C# pattern-matching switch expression handling exchange rates under the hood.</p>`,
+          6: `<strong>Minute 03:30 - 04:15 | The 3-Year Traffic Light Rule</strong>
+              <p style="margin-top:8px;">• The "Tech Milk" & Depreciation analogy: Hardware loses value and hits $0 / 0 SEK at year 3.</p>
+              <p style="margin-top:6px;">• Drag the lifespan slider on the slide in real-time:</p>
+              <p style="margin-top:4px;">&nbsp;&nbsp;🟢 0-33 months: Green (Fresh, zero worries)</p>
+              <p style="margin-top:4px;">&nbsp;&nbsp;🟡 33-36 months: Yellow (Less than 3 months left — budget alert!)</p>
+              <p style="margin-top:4px;">&nbsp;&nbsp;🔴 36+ months: Red (Obsolete! Time to recycle and upgrade)</p>`,
+          7: `<strong>Minute 04:15 - 04:50 | The System in Action & Summary</strong>
+              <p style="margin-top:8px;">• Walk through the simulated C# terminal output: items sorted by Office and Purchase Date.</p>
+              <p style="margin-top:6px;">• Notice how expired items immediately flash Red in the console, yellow warnings pop, and green items are calm.</p>
+              <p style="margin-top:6px;">• Click "View .NET 10 Code" to jump right into the full compiling source code on Slide 8!</p>`,
+          8: `<strong>Minute 04:50 - 05:30 | .NET 10 C# Code Deep Dive</strong>
+              <p style="margin-top:8px;">• Show your classmates the actual, un-truncated C# code running in a .NET 10 environment.</p>
+              <p style="margin-top:6px;">• Point out the OOP hierarchy: <code>abstract class Device</code> base blueprint, then <code>class Laptop : Device</code> and <code>class Phone : Device</code>.</p>
+              <p style="margin-top:6px;">• Demonstrate live edits: Click presets like "+ London (£)" or "2-Yr Expiry", or edit values directly in the textarea, then click "Run / Recompile" to prove the console updates in real time!</p>
+              <p style="margin-top:6px;">• Click "Copy" to grab the full source code for submission.</p>`
+        };
+
+        function updateNotesModal(slideNum) {
+          const title = document.getElementById('notesTitle');
+          const body = document.getElementById('notesBody');
+          if (title) title.textContent = `Slide ${slideNum} Presenter Notes`;
+          if (body) body.innerHTML = presenterNotes[slideNum] || '<p>No notes for this slide.</p>';
+        }
+
+        // --- SLIDE NAVIGATION ENGINE ---
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.nav-dot-btn');
+        const progressBar = document.getElementById('progressBar');
+        const slideCounter = document.getElementById('slideCounter');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+
+        function goToSlide(target) {
+          if (target < 1 || target > totalSlides || target === currentSlide) return;
+
+          playTone(480 + target * 40, 'sine', 0.05, 0.08);
+
+          slides.forEach((slide) => {
+            const slideNum = parseInt(slide.dataset.slide, 10);
+            slide.classList.remove('active', 'prev');
+            if (slideNum === target) {
+              slide.classList.add('active');
+            } else if (slideNum < target) {
+              slide.classList.add('prev');
+            }
+          });
+
+          dots.forEach((dot) => {
+            dot.classList.toggle('active', parseInt(dot.dataset.slide, 10) === target);
+          });
+
+          currentSlide = target;
+
+          // Update Progress UI
+          if (progressBar) {
+            progressBar.style.width = `${(currentSlide / totalSlides) * 100}%`;
+          }
+          if (slideCounter) {
+            slideCounter.textContent = `Slide ${currentSlide} of ${totalSlides}`;
+          }
+
+          // Update Prev/Next Buttons
+          if (btnPrev) btnPrev.disabled = currentSlide === 1;
+          if (btnNext) {
+            if (currentSlide === totalSlides) {
+              btnNext.innerHTML = `Finish <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            } else {
+              btnNext.innerHTML = `Next <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+            }
+          }
+
+          // Subtle ambient glow movement
+          const glow1 = document.getElementById('glow1');
+          const glow2 = document.getElementById('glow2');
+          if (glow1) glow1.style.transform = `translate(${target * 20}px, ${target * 10}px)`;
+          if (glow2) glow2.style.transform = `translate(${-target * 25}px, ${-target * 15}px)`;
+
+          updateNotesModal(currentSlide);
+        }
+
+        // Prev & Next clicks
+        if (btnPrev) btnPrev.addEventListener('click', () => goToSlide(currentSlide - 1));
+        if (btnNext) {
+          btnNext.addEventListener('click', () => {
+            if (currentSlide === totalSlides) {
+              goToSlide(1);
+            } else {
+              goToSlide(currentSlide + 1);
+            }
+          });
+        }
+
+        // Dot navigation
+        dots.forEach((dot) => {
+          dot.addEventListener('click', () => {
+            goToSlide(parseInt(dot.dataset.slide, 10));
+          });
+        });
+
+        // Keyboard navigation
+        window.addEventListener('keydown', (e) => {
+          // If modal open, Esc closes it
+          const modal = document.getElementById('notesModal');
+          if (e.key === 'Escape' && modal && modal.classList.contains('open')) {
+            modal.classList.remove('open');
+            return;
+          }
+
+          if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+            e.preventDefault();
+            if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
+          } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+            e.preventDefault();
+            if (currentSlide > 1) goToSlide(currentSlide - 1);
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            goToSlide(1);
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            goToSlide(totalSlides);
+          } else if (e.key === 'p' || e.key === 'P') {
+            e.preventDefault();
+            if (modal) modal.classList.toggle('open');
+          }
+        });
+
+        // Touch Swipe Navigation for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const deckStage = document.getElementById('deckStage');
+        if (deckStage) {
+          deckStage.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+          }, { passive: true });
+          deckStage.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) {
+              if (currentSlide < totalSlides) goToSlide(currentSlide + 1);
+            } else if (touchEndX - touchStartX > 50) {
+              if (currentSlide > 1) goToSlide(currentSlide - 1);
+            }
+          }, { passive: true });
+        }
+
+        // Sound Toggle
+        const btnAudioToggle = document.getElementById('btnAudioToggle');
+        if (btnAudioToggle) {
+          btnAudioToggle.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('audioIcon');
+            if (icon) {
+              icon.innerHTML = soundEnabled
+                ? '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>'
+                : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+            }
+            playTone(soundEnabled ? 640 : 320, 'sine', 0.1, 0.1);
+          });
+        }
+
+        // Fullscreen Toggle
+        const btnFullscreen = document.getElementById('btnFullscreen');
+        if (btnFullscreen) {
+          btnFullscreen.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+              document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+              document.exitFullscreen().catch(() => {});
+            }
+          });
+        }
+
+        // Notes Modal Handlers
+        const btnNotes = document.getElementById('btnNotes');
+        const notesModal = document.getElementById('notesModal');
+        const btnCloseNotes = document.getElementById('btnCloseNotes');
+        if (btnNotes && notesModal) {
+          btnNotes.addEventListener('click', () => {
+            updateNotesModal(currentSlide);
+            notesModal.classList.add('open');
+          });
+        }
+        if (btnCloseNotes && notesModal) {
+          btnCloseNotes.addEventListener('click', () => notesModal.classList.remove('open'));
+        }
+        if (notesModal) {
+          notesModal.addEventListener('click', (e) => {
+            if (e.target === notesModal) notesModal.classList.remove('open');
+          });
+        }
+
+        // Start Presentation button on Slide 1
+        const btnStartDeck = document.getElementById('btnStartDeck');
+        if (btnStartDeck) {
+          btnStartDeck.addEventListener('click', () => goToSlide(2));
+        }
+
+        // Restart presentation from Slide 7
+        const btnRestartDeck = document.getElementById('btnRestartDeck');
+        if (btnRestartDeck) {
+          btnRestartDeck.addEventListener('click', () => goToSlide(1));
+        }
+
+        const btnGoToSlide8 = document.getElementById('btnGoToSlide8');
+        if (btnGoToSlide8) {
+          btnGoToSlide8.addEventListener('click', () => goToSlide(8));
+        }
+
+        // ======================================================================
+        // SLIDE 1 WIDGET: CHAOS VS TRACKED SIMULATION
+        // ======================================================================
+        const btnSimChaos = document.getElementById('btnSimChaos');
+        const btnSimTracked = document.getElementById('btnSimTracked');
+        const slide1SimStage = document.getElementById('slide1SimStage');
+        const simStatusText = document.getElementById('simStatusText');
+        const btnAddSampleDevice = document.getElementById('btnAddSampleDevice');
+
+        let isChaosMode = true;
+
+        const chaosItems = [
+          { name: 'MacBook Pro', loc: 'Lost in NY?', icon: '💻', top: '15%', left: '10%' },
+          { name: 'iPhone 13', loc: 'Who has this?', icon: '📱', top: '55%', left: '20%' },
+          { name: 'Dell XPS 15', loc: 'Madrid desk 4', icon: '💻', top: '25%', left: '50%' },
+          { name: 'iPad Pro', loc: 'Stockholm closet', icon: '📱', top: '65%', left: '60%' },
+          { name: 'ThinkPad T14', loc: 'Unknown', icon: '💻', top: '18%', left: '78%' }
+        ];
+
+        const trackedOffices = {
+          USA: [
+            { name: 'MacBook Pro 16"', owner: 'Sarah (Eng)', status: '🟢 Healthy' },
+            { name: 'iPhone 15 Pro', owner: 'Alex (Sales)', status: '🟢 Healthy' }
+          ],
+          Sweden: [
+            { name: 'Dell XPS 15', owner: 'Bjorn (Ops)', status: '🟡 Expiring' },
+            { name: 'iPad Pro 11"', owner: 'Linnea (Design)', status: '🟢 Healthy' }
+          ],
+          Spain: [
+            { name: 'ThinkPad X1', owner: 'Carlos (Product)', status: '🔴 Expired' },
+            { name: 'iPhone 14', owner: 'Elena (Marketing)', status: '🟢 Healthy' }
+          ]
+        };
+
+        function renderSlide1Simulation() {
+          if (!slide1SimStage) return;
+          slide1SimStage.innerHTML = '';
+
+          if (isChaosMode) {
+            chaosItems.forEach((item) => {
+              const el = document.createElement('div');
+              el.className = 'chaos-gadget';
+              el.style.top = item.top;
+              el.style.left = item.left;
+              el.innerHTML = `<span>${item.icon}</span> <strong>${item.name}</strong> <span>(${item.loc})</span>`;
+              slide1SimStage.appendChild(el);
+            });
+            if (simStatusText) {
+              simStatusText.textContent = '❌ 15 Lost Devices • Unknown Costs • Zero Auditing';
+              simStatusText.style.color = '#f87171';
+            }
+          } else {
+            const grid = document.createElement('div');
+            grid.className = 'tracked-grid';
+
+            Object.entries(trackedOffices).forEach(([office, devices]) => {
+              const col = document.createElement('div');
+              col.className = 'office-col';
+              col.innerHTML = `
+                <div class="office-col-header">
+                  <span>${office} Office</span>
+                  <span>${devices.length} Items</span>
+                </div>
+              `;
+              devices.forEach((d) => {
+                const chip = document.createElement('div');
+                chip.className = 'device-chip';
+                chip.innerHTML = `
+                  <div>
+                    <div style="font-weight:600; color:#fff;">${d.name}</div>
+                    <div style="font-size:10px; color:#94a3b8;">${d.owner}</div>
+                  </div>
+                  <span style="font-size:10px;">${d.status}</span>
+                `;
+                col.appendChild(chip);
+              });
+              grid.appendChild(col);
+            });
+            slide1SimStage.appendChild(grid);
+            if (simStatusText) {
+              simStatusText.textContent = '✅ All Devices Bound to Offices • Live Auditing Enabled';
+              simStatusText.style.color = '#34d399';
+            }
+          }
+        }
+
+        if (btnSimChaos && btnSimTracked) {
+          btnSimChaos.addEventListener('click', () => {
+            isChaosMode = true;
+            btnSimChaos.classList.add('active', 'chaos');
+            btnSimTracked.classList.remove('active', 'tracked');
+            renderSlide1Simulation();
+            playTone(300, 'sawtooth', 0.1, 0.05);
+          });
+
+          btnSimTracked.addEventListener('click', () => {
+            isChaosMode = false;
+            btnSimTracked.classList.add('active', 'tracked');
+            btnSimChaos.classList.remove('active', 'chaos');
+            renderSlide1Simulation();
+            playTone(600, 'triangle', 0.1, 0.07);
+          });
+        }
+
+        if (btnAddSampleDevice) {
+          btnAddSampleDevice.addEventListener('click', () => {
+            playTone(720, 'sine', 0.08, 0.08);
+            if (isChaosMode) {
+              chaosItems.push({
+                name: 'New Asset #' + (chaosItems.length + 1),
+                loc: 'Unassigned',
+                icon: '💻',
+                top: `${20 + Math.random() * 50}%`,
+                left: `${15 + Math.random() * 70}%`
+              });
+              renderSlide1Simulation();
+            } else {
+              trackedOffices.USA.push({
+                name: 'MacBook Air M3',
+                owner: 'New Hire (Eng)',
+                status: '🟢 Fresh'
+              });
+              renderSlide1Simulation();
+            }
+          });
+        }
+
+        renderSlide1Simulation();
+
+        // ======================================================================
+        // SLIDE 2 WIDGET: OOP INHERITANCE INSPECTOR
+        // ======================================================================
+        const oopData = {
+          device: {
+            title: 'class Device (Parent Blueprint)',
+            badge: 'Base Abstract Class',
+            code: `<span class="c-kw">public abstract class</span> <span class="c-type">Device</span>
+{
+    <span class="c-kw">public string</span> Model { <span class="c-kw">get</span>; <span class="c-kw">set</span>; }
+    <span class="c-kw">public decimal</span> PriceUSD { <span class="c-kw">get</span>; <span class="c-kw">set</span>; }
+    <span class="c-kw">public DateTime</span> PurchaseDate { <span class="c-kw">get</span>; <span class="c-kw">set</span>; }
+    <span class="c-kw">public string</span> Office { <span class="c-kw">get</span>; <span class="c-kw">set</span>; }
+}`,
+            traits: [
+              { name: 'Model', type: 'string', status: 'Core Blueprint' },
+              { name: 'PriceUSD', type: 'decimal', status: 'Core Blueprint' },
+              { name: 'PurchaseDate', type: 'DateTime', status: 'Core Blueprint' },
+              { name: 'Office', type: 'string', status: 'Core Blueprint' }
+            ]
+          },
+          laptop: {
+            title: 'class Laptop : Device (Child Class)',
+            badge: 'Inherits Everything from Device',
+            code: `<span class="c-kw">public class</span> <span class="c-type">Laptop</span> : <span class="c-type">Device</span>
+{
+    <span class="c-com">// Inherits Model, PriceUSD, PurchaseDate, Office</span>
+    <span class="c-kw">public double</span> ScreenSizeInches { <span class="c-kw">get</span>; <span class="c-kw">set</span>; }
+    <span class="c-kw">public string</span> Processor { <span class="c-kw">get</span>; <span class="c-kw">set</span>; }
+}`,
+            traits: [
+              { name: 'Model, Price, Date, Office', type: 'Base Members', status: '✨ Inherited Free!' },
+              { name: 'ScreenSizeInches', type: 'double', status: '🚀 Laptop-Only Trait' },
+              { name: 'Processor', type: 'string', status: '🚀 Laptop-Only Trait' }
+            ]
+          },
+          phone: {
+            title: 'class Phone : Device (Child Class)',
+            badge: 'Inherits Everything from Device',
+            code: `<span class="c-kw">public class</span> <span class="c-type">Phone</span> : <span class="c-type">Device</span>
+{
+    <span class="c-com">// Inherits Model, PriceUSD, PurchaseDate, Office</span>
+    <span class="c-kw">public string</span> SimCardNumber { <span class="c-kw">get</span>; <span class="c-kw">set</span>; }
+    <span class="c-kw">public bool</span> Has5G { <span class="c-kw">get</span>; <span class="c-kw">set</span>; }
+}`,
+            traits: [
+              { name: 'Model, Price, Date, Office', type: 'Base Members', status: '✨ Inherited Free!' },
+              { name: 'SimCardNumber', type: 'string', status: '📱 Phone-Only Trait' },
+              { name: 'Has5G', type: 'bool', status: '📱 Phone-Only Trait' }
+            ]
+          }
+        };
+
+        const treeCards = document.querySelectorAll('.tree-card');
+        const inspectorTitle = document.getElementById('inspectorTitle');
+        const inspectorBadge = document.getElementById('inspectorBadge');
+        const inspectorCode = document.getElementById('inspectorCode');
+        const inspectorTraits = document.getElementById('inspectorTraits');
+
+        function selectOopCard(targetKey) {
+          treeCards.forEach((c) => {
+            c.classList.toggle('selected', c.dataset.target === targetKey);
+          });
+
+          const data = oopData[targetKey];
+          if (!data) return;
+
+          if (inspectorTitle) inspectorTitle.textContent = data.title;
+          if (inspectorBadge) inspectorBadge.textContent = data.badge;
+          if (inspectorCode) inspectorCode.innerHTML = data.code;
+
+          if (inspectorTraits) {
+            inspectorTraits.innerHTML = '';
+            data.traits.forEach((t) => {
+              const div = document.createElement('div');
+              div.className = 'trait-tag';
+              const isInherited = t.status.includes('Inherited');
+              div.innerHTML = `
+                <span class="${isInherited ? 'trait-inherited' : 'trait-unique'}">${t.name}</span>
+                <span style="font-size:10px; color:${isInherited ? '#c4b5fd' : '#38bdf8'}">${t.status}</span>
+              `;
+              inspectorTraits.appendChild(div);
+            });
+          }
+        }
+
+        treeCards.forEach((card) => {
+          card.addEventListener('click', () => {
+            playTone(520, 'sine', 0.05, 0.06);
+            selectOopCard(card.dataset.target);
+          });
+        });
+
+        // Initialize Slide 2 inspector
+        selectOopCard('device');
+
+        // ======================================================================
+        // SLIDE 3 WIDGET: VIRTUAL & ANIMATED INTERACTIVE UML CLASS DIAGRAM
+        // ======================================================================
+        const umlClasses = {
+          device: {
+            title: 'abstract class Device',
+            badge: 'Base Abstract Class',
+            stereotype: '<<abstract>>',
+            desc: 'The foundational blueprint defining all universal fields (Model, PriceUSD, PurchaseDate, Office) and virtual methods. Cannot be instantiated with "new Device()".',
+            members: [
+              { vis: '+', name: 'Model : string', kind: 'Property { get; set; }' },
+              { vis: '+', name: 'PriceUSD : decimal', kind: 'Property { get; set; }' },
+              { vis: '+', name: 'PurchaseDate : DateTime', kind: 'Property { get; set; }' },
+              { vis: '+', name: 'Office : string', kind: 'Property { get; set; }' },
+              { vis: '+', name: 'GetPriceInLocal() : decimal', kind: 'Virtual Method (Rates)' },
+              { vis: '+', name: 'GetCurrencySymbol() : string', kind: 'Virtual Method ($, kr, €)' },
+              { vis: '+', name: 'GetStatus(today) : (Color, str)', kind: 'Method (3-Yr Rule)' }
+            ]
+          },
+          laptop: {
+            title: 'class Laptop : Device',
+            badge: 'Subclass / Specialization',
+            stereotype: ': Device (Generalization)',
+            desc: 'Extends Device. Inherits all 4 base properties and 3 methods for free without writing duplicate code, while specializing with hardware screen size.',
+            members: [
+              { vis: '↑', name: 'Model, PriceUSD, PurchaseDate, Office', kind: 'Inherited from Device' },
+              { vis: '↑', name: 'GetPriceInLocal(), GetCurrencySymbol(), GetStatus()', kind: 'Inherited from Device' },
+              { vis: '+', name: 'ScreenSizeInches : double', kind: 'Subclass Property' },
+              { vis: '+', name: 'Processor : string', kind: 'Subclass Property' }
+            ]
+          },
+          phone: {
+            title: 'class Phone : Device',
+            badge: 'Subclass / Specialization',
+            stereotype: ': Device (Generalization)',
+            desc: 'Extends Device. Inherits universal device tracking while adding mobile cellular hardware specs (SIM card and 5G connectivity).',
+            members: [
+              { vis: '↑', name: 'Model, PriceUSD, PurchaseDate, Office', kind: 'Inherited from Device' },
+              { vis: '↑', name: 'GetPriceInLocal(), GetCurrencySymbol(), GetStatus()', kind: 'Inherited from Device' },
+              { vis: '+', name: 'SimCardNumber : string', kind: 'Subclass Property' },
+              { vis: '+', name: 'Has5G : bool', kind: 'Subclass Property' }
+            ]
+          },
+          program: {
+            title: 'class Program',
+            badge: 'Driver / Entry Point',
+            stereotype: '<<entry>>',
+            desc: 'Host runtime. Declares polymorphic List<Device> devices = new(); and calls virtual methods uniformly on all gadgets regardless of concrete child type.',
+            members: [
+              { vis: '+', name: 'Main() : void', kind: 'Static Method' },
+              { vis: '..>', name: 'Dependency: List<Device>', kind: 'Polymorphic Container' }
+            ]
+          }
+        };
+
+        const umlNodes = {
+          device: document.getElementById('umlNodeDevice'),
+          laptop: document.getElementById('umlNodeLaptop'),
+          phone: document.getElementById('umlNodePhone'),
+          program: document.getElementById('umlNodeProgram')
+        };
+
+        const umlChips = {
+          device: document.getElementById('umlChipDevice'),
+          laptop: document.getElementById('umlChipLaptop'),
+          phone: document.getElementById('umlChipPhone'),
+          program: document.getElementById('umlChipProgram')
+        };
+
+        const btnUmlModeInspect = document.getElementById('btnUmlModeInspect');
+        const btnUmlModeInheritance = document.getElementById('btnUmlModeInheritance');
+        const btnUmlModePoly = document.getElementById('btnUmlModePoly');
+        const btnUmlPlayPause = document.getElementById('btnUmlPlayPause');
+        const umlPlayIcon = document.getElementById('umlPlayIcon');
+        const umlPlayText = document.getElementById('umlPlayText');
+        const btnUmlReset = document.getElementById('btnUmlReset');
+
+        const umlInspectorTitle = document.getElementById('umlInspectorTitle');
+        const umlInspectorBadge = document.getElementById('umlInspectorBadge');
+        const umlInspectorDesc = document.getElementById('umlInspectorDesc');
+        const umlInspectorMembers = document.getElementById('umlInspectorMembers');
+        const btnUmlTestDispatch = document.getElementById('btnUmlTestDispatch');
+        const umlDispatchOutput = document.getElementById('umlDispatchOutput');
+
+        const umlStemLine = document.getElementById('umlStemLine');
+        const umlTrunkLine = document.getElementById('umlTrunkLine');
+        const umlGenTriangle = document.getElementById('umlGenTriangle');
+        const umlDepLine = document.getElementById('umlDepLine');
+        const umlDepArrow = document.getElementById('umlDepArrow');
+
+        const umlParticle1 = document.getElementById('umlParticle1');
+        const umlParticle2 = document.getElementById('umlParticle2');
+        const umlParticle3 = document.getElementById('umlParticle3');
+        const umlStatusPill = document.getElementById('umlStatusPill');
+        const umlStatusText = document.getElementById('umlStatusText');
+
+        let currentUmlMode = 'inspect';
+        let umlAnimationRunning = true;
+        let umlAnimFrameId = null;
+        let currentUmlSelected = 'device';
+
+        function updateUmlInspector(key) {
+          const data = umlClasses[key];
+          if (!data) return;
+
+          currentUmlSelected = key;
+
+          if (umlInspectorTitle) umlInspectorTitle.textContent = data.title;
+          if (umlInspectorBadge) {
+            umlInspectorBadge.textContent = data.badge;
+            if (key === 'device') {
+              umlInspectorBadge.style.borderColor = 'rgba(6,182,212,0.4)';
+              umlInspectorBadge.style.color = '#67e8f9';
+            } else if (key === 'program') {
+              umlInspectorBadge.style.borderColor = 'rgba(168,85,247,0.4)';
+              umlInspectorBadge.style.color = '#c084fc';
+            } else {
+              umlInspectorBadge.style.borderColor = 'rgba(52,211,153,0.4)';
+              umlInspectorBadge.style.color = '#86efac';
+            }
+          }
+          if (umlInspectorDesc) umlInspectorDesc.textContent = data.desc;
+
+          if (umlInspectorMembers) {
+            umlInspectorMembers.innerHTML = '';
+            data.members.forEach((m) => {
+              const row = document.createElement('div');
+              row.className = 'uml-mem-row';
+              const isInherited = m.vis === '↑';
+              const isDep = m.vis === '..>';
+              const visClass = isInherited ? 'color:#a855f7; font-weight:700;' : isDep ? 'color:#38bdf8;' : 'color:#34d399; font-weight:700;';
+              row.innerHTML = `
+                <span style="${visClass}">${m.vis}</span>
+                <span style="${isInherited ? 'color:#c4b5fd;' : ''}">${m.name}</span>
+                <span style="margin-left:auto; font-size:9px; color:#64748b;">${m.kind}</span>
+              `;
+              umlInspectorMembers.appendChild(row);
+            });
+          }
+        }
+
+        function selectUmlNode(key, triggerAudio = true) {
+          Object.entries(umlNodes).forEach(([k, node]) => {
+            if (node) node.classList.toggle('selected', k === key);
+          });
+          Object.entries(umlChips).forEach(([k, chip]) => {
+            if (chip) {
+              chip.style.borderColor = k === key ? 'rgba(6,182,212,0.8)' : '';
+              chip.style.background = k === key ? 'rgba(6,182,212,0.2)' : '';
+              chip.style.color = k === key ? '#67e8f9' : '';
+            }
+          });
+
+          updateUmlInspector(key);
+
+          // Highlight matching connection arrows
+          if (key === 'laptop' || key === 'phone' || key === 'device') {
+            umlStemLine?.classList.add('active-flow');
+            umlTrunkLine?.classList.add('active-flow');
+            umlGenTriangle?.classList.add('active-flow');
+            umlDepLine?.classList.remove('active-flow');
+          } else if (key === 'program') {
+            umlDepLine?.classList.add('active-flow');
+            umlStemLine?.classList.remove('active-flow');
+            umlTrunkLine?.classList.remove('active-flow');
+            umlGenTriangle?.classList.remove('active-flow');
+          }
+
+          if (currentUmlMode === 'inspect' && umlStatusText) {
+            umlStatusText.textContent = `Selected: ${umlClasses[key].title} • Click other nodes to inspect`;
+          }
+
+          if (triggerAudio) {
+            playTone(key === 'device' ? 520 : key === 'program' ? 620 : 580, 'sine', 0.06, 0.08);
+          }
+        }
+
+        // Particle animation loop along UML paths
+        let particleProgress = 0;
+        function animateUmlParticles() {
+          if (umlAnimationRunning) {
+            particleProgress = (particleProgress + 0.015) % 1;
+
+            if (currentUmlMode === 'inheritance') {
+              // Pulse 1: travels down vertical stem (y: 142 -> 168, x: 270)
+              const y1 = 142 + particleProgress * 26;
+              if (umlParticle1) {
+                umlParticle1.setAttribute('cx', 270);
+                umlParticle1.setAttribute('cy', y1);
+                umlParticle1.style.opacity = '1';
+                umlParticle1.classList.add('flowing');
+              }
+
+              // Pulse 2: travels along left branch to Laptop (x: 270 -> 112, then y: 168 -> 186)
+              let x2, y2;
+              if (particleProgress < 0.7) {
+                x2 = 270 - (particleProgress / 0.7) * 158;
+                y2 = 168;
+              } else {
+                x2 = 112;
+                y2 = 168 + ((particleProgress - 0.7) / 0.3) * 18;
+              }
+              if (umlParticle2) {
+                umlParticle2.setAttribute('cx', x2);
+                umlParticle2.setAttribute('cy', y2);
+                umlParticle2.style.opacity = '1';
+                umlParticle2.classList.add('flowing');
+              }
+
+              // Pulse 3: travels along right branch to Phone (x: 270 -> 428, then y: 168 -> 186)
+              let x3, y3;
+              if (particleProgress < 0.7) {
+                x3 = 270 + (particleProgress / 0.7) * 158;
+                y3 = 168;
+              } else {
+                x3 = 428;
+                y3 = 168 + ((particleProgress - 0.7) / 0.3) * 18;
+              }
+              if (umlParticle3) {
+                umlParticle3.setAttribute('cx', x3);
+                umlParticle3.setAttribute('cy', y3);
+                umlParticle3.style.opacity = '1';
+                umlParticle3.classList.add('flowing');
+              }
+            } else if (currentUmlMode === 'poly') {
+              // Signal travels from Program (124) across to Device (166) at y: 46
+              const px = 124 + particleProgress * 42;
+              if (umlParticle1) {
+                umlParticle1.setAttribute('cx', px);
+                umlParticle1.setAttribute('cy', 46);
+                umlParticle1.style.opacity = '1';
+                umlParticle1.classList.add('flowing');
+              }
+              if (umlParticle2) umlParticle2.style.opacity = '0';
+              if (umlParticle3) umlParticle3.style.opacity = '0';
+            } else {
+              if (umlParticle1) umlParticle1.style.opacity = '0';
+              if (umlParticle2) umlParticle2.style.opacity = '0';
+              if (umlParticle3) umlParticle3.style.opacity = '0';
+            }
+          }
+          umlAnimFrameId = requestAnimationFrame(animateUmlParticles);
+        }
+
+        function setUmlMode(mode) {
+          currentUmlMode = mode;
+          [btnUmlModeInspect, btnUmlModeInheritance, btnUmlModePoly].forEach(b => b?.classList.remove('active'));
+
+          if (mode === 'inspect') {
+            btnUmlModeInspect?.classList.add('active');
+            umlStemLine?.classList.remove('active-flow');
+            umlTrunkLine?.classList.remove('active-flow');
+            umlGenTriangle?.classList.remove('active-flow');
+            umlDepLine?.classList.remove('active-flow');
+            if (umlStatusText) umlStatusText.textContent = 'Mode: Interactive Inspector (Click any class node)';
+            if (umlDispatchOutput) umlDispatchOutput.textContent = '';
+            selectUmlNode('device', false);
+          } else if (mode === 'inheritance') {
+            btnUmlModeInheritance?.classList.add('active');
+            umlStemLine?.classList.add('active-flow');
+            umlTrunkLine?.classList.add('active-flow');
+            umlGenTriangle?.classList.add('active-flow');
+            umlDepLine?.classList.remove('active-flow');
+            if (umlStatusText) umlStatusText.textContent = '⚡ Animated: Properties Streaming from Device → Laptop & Phone';
+            if (umlDispatchOutput) {
+              umlDispatchOutput.innerHTML = '<span style="color:#67e8f9;">✨ 4 properties & 3 methods streaming to child blueprints!</span>';
+            }
+            playTone(660, 'triangle', 0.08, 0.1);
+          } else if (mode === 'poly') {
+            btnUmlModePoly?.classList.add('active');
+            umlStemLine?.classList.add('active-flow');
+            umlTrunkLine?.classList.add('active-flow');
+            umlGenTriangle?.classList.add('active-flow');
+            umlDepLine?.classList.add('active-flow');
+            if (umlStatusText) umlStatusText.textContent = '🔄 Animated: Polymorphic Dispatch from Program to Device Collection';
+            if (umlDispatchOutput) {
+              umlDispatchOutput.innerHTML = '<span style="color:#c084fc;">Click "⚡ Test Polymorphic Method Call" below to trace!</span>';
+            }
+            playTone(740, 'sine', 0.08, 0.1);
+          }
+        }
+
+        // Attach Node & Chip Click Listeners
+        Object.entries(umlNodes).forEach(([key, el]) => {
+          el?.addEventListener('click', () => selectUmlNode(key));
+        });
+        Object.entries(umlChips).forEach(([key, el]) => {
+          el?.addEventListener('click', () => selectUmlNode(key));
+        });
+
+        // Tab Mode Listeners
+        btnUmlModeInspect?.addEventListener('click', () => setUmlMode('inspect'));
+        btnUmlModeInheritance?.addEventListener('click', () => setUmlMode('inheritance'));
+        btnUmlModePoly?.addEventListener('click', () => setUmlMode('poly'));
+
+        // Play/Pause Listener
+        btnUmlPlayPause?.addEventListener('click', () => {
+          umlAnimationRunning = !umlAnimationRunning;
+          if (umlPlayIcon) umlPlayIcon.textContent = umlAnimationRunning ? '⏸' : '▶';
+          if (umlPlayText) umlPlayText.textContent = umlAnimationRunning ? 'Pause' : 'Play';
+          playTone(umlAnimationRunning ? 640 : 380, 'sine', 0.05, 0.08);
+        });
+
+        // Reset Button
+        btnUmlReset?.addEventListener('click', () => {
+          umlAnimationRunning = true;
+          if (umlPlayIcon) umlPlayIcon.textContent = '⏸';
+          if (umlPlayText) umlPlayText.textContent = 'Pause';
+          setUmlMode('inspect');
+          selectUmlNode('device');
+          if (umlDispatchOutput) umlDispatchOutput.textContent = '';
+        });
+
+        // Interactive Polymorphic Test Button
+        btnUmlTestDispatch?.addEventListener('click', () => {
+          setUmlMode('poly');
+          if (umlDispatchOutput) {
+            umlDispatchOutput.innerHTML = '<span style="color:#fde047;">[1/2] Program calls laptop.GetPriceInLocalCurrency()...</span>';
+          }
+
+          // Flash Laptop Node
+          umlNodes.laptop?.classList.add('node-flashing');
+          playTone(600, 'triangle', 0.08, 0.1);
+
+          setTimeout(() => {
+            umlNodes.laptop?.classList.remove('node-flashing');
+            if (umlDispatchOutput) {
+              umlDispatchOutput.innerHTML = `
+                <div style="color:#38bdf8;">[1/2] Laptop.GetPriceInLocalCurrency() =&gt; $2,400.00 USD</div>
+                <div style="color:#fde047;">[2/2] Program calls phone.GetPriceInLocalCurrency()...</div>
+              `;
+            }
+            umlNodes.phone?.classList.add('node-flashing');
+            playTone(720, 'sine', 0.08, 0.1);
+
+            setTimeout(() => {
+              umlNodes.phone?.classList.remove('node-flashing');
+              if (umlDispatchOutput) {
+                umlDispatchOutput.innerHTML = `
+                  <div style="color:#38bdf8;">[1/2] Laptop: $2,400.00 USD</div>
+                  <div style="color:#38bdf8;">[2/2] Phone: $1,100.00 USD</div>
+                  <div style="color:#34d399; font-weight:700; margin-top:2px;">✅ Polymorphic loop complete: 2 distinct classes evaluated uniformly!</div>
+                `;
+              }
+              playTone(880, 'sine', 0.1, 0.12);
+            }, 600);
+          }, 600);
+        });
+
+        // Initialize Slide 3 UML
+        selectUmlNode('device', false);
+        animateUmlParticles();
+
+        // ======================================================================
+        // SLIDE 4 WIDGET: MULTI-OFFICE & CURRENCY CONVERTER
+        // ======================================================================
+        let currentRate = 10.50;
+        let currentCurrency = 'SEK';
+        let currentSymbol = 'kr';
+        let currentOfficeName = 'Sweden (Malmö)';
+
+        const officeBtns = document.querySelectorAll('.office-btn');
+        const priceRangeSlider = document.getElementById('priceRangeSlider');
+        const sliderPriceLabel = document.getElementById('sliderPriceLabel');
+        const priceHeroOffice = document.getElementById('priceHeroOffice');
+        const priceHeroValue = document.getElementById('priceHeroValue');
+        const priceHeroFormula = document.getElementById('priceHeroFormula');
+
+        const rowPriceMac = document.getElementById('rowPriceMac');
+        const rowPriceIPhone = document.getElementById('rowPriceIPhone');
+        const rowPriceDell = document.getElementById('rowPriceDell');
+
+        function updateCurrencyCalculator() {
+          const basePrice = parseFloat(priceRangeSlider.value);
+          const converted = (basePrice * currentRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+          if (sliderPriceLabel) sliderPriceLabel.textContent = `$${basePrice.toLocaleString()} USD`;
+          if (priceHeroOffice) priceHeroOffice.textContent = `${currentOfficeName} Office Localized Cost`;
+
+          if (priceHeroValue) {
+            priceHeroValue.textContent = currentSymbol === 'kr' ? `${converted} kr` : `${currentSymbol}${converted}`;
+          }
+
+          if (priceHeroFormula) {
+            priceHeroFormula.textContent = `$${basePrice.toLocaleString()} USD × ${currentRate.toFixed(2)} = ${currentSymbol === 'kr' ? converted + ' kr' : currentSymbol + converted} ${currentCurrency}`;
+          }
+
+          // Update sample table rows
+          const macConverted = (2400 * currentRate).toLocaleString('en-US', { minimumFractionDigits: 2 });
+          const iphoneConverted = (1100 * currentRate).toLocaleString('en-US', { minimumFractionDigits: 2 });
+          const dellConverted = (650 * currentRate).toLocaleString('en-US', { minimumFractionDigits: 2 });
+
+          if (rowPriceMac) rowPriceMac.textContent = currentSymbol === 'kr' ? `${macConverted} kr` : `${currentSymbol}${macConverted}`;
+          if (rowPriceIPhone) rowPriceIPhone.textContent = currentSymbol === 'kr' ? `${iphoneConverted} kr` : `${currentSymbol}${iphoneConverted}`;
+          if (rowPriceDell) rowPriceDell.textContent = currentSymbol === 'kr' ? `${dellConverted} kr` : `${currentSymbol}${dellConverted}`;
+        }
+
+        officeBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            officeBtns.forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            currentRate = parseFloat(btn.dataset.rate);
+            currentCurrency = btn.dataset.curr;
+            currentSymbol = btn.dataset.sym;
+            currentOfficeName = btn.dataset.office;
+
+            playTone(600 + currentRate * 20, 'sine', 0.05, 0.08);
+            updateCurrencyCalculator();
+          });
+        });
+
+        if (priceRangeSlider) {
+          priceRangeSlider.addEventListener('input', () => {
+            updateCurrencyCalculator();
+          });
+        }
+
+        updateCurrencyCalculator();
+
+        // ======================================================================
+        // SLIDE 5 WIDGET: TRAFFIC LIGHT EXPIRATION SLIDER
+        // ======================================================================
+        const lifespanSlider = document.getElementById('lifespanSlider');
+        const ageSliderLabel = document.getElementById('ageSliderLabel');
+        const lightRed = document.getElementById('lightRed');
+        const lightYellow = document.getElementById('lightYellow');
+        const lightGreen = document.getElementById('lightGreen');
+        const deviceStatusCard = document.getElementById('deviceStatusCard');
+        const statusDeviceDate = document.getElementById('statusDeviceDate');
+        const statusPillText = document.getElementById('statusPillText');
+        const statusActionText = document.getElementById('statusActionText');
+        const statusRemainingDays = document.getElementById('statusRemainingDays');
+
+        function updateTrafficLightWidget() {
+          const months = parseInt(lifespanSlider.value, 10);
+          const totalDays = 365 * 3; // 1,095 days in 3 years
+          const elapsedDays = Math.round((months / 36) * totalDays);
+          const remainingDays = totalDays - elapsedDays;
+
+          if (ageSliderLabel) {
+            ageSliderLabel.textContent = `${months} Months Old (${(months / 12).toFixed(1)} Years)`;
+          }
+          if (statusDeviceDate) {
+            statusDeviceDate.textContent = `Purchased: ${months} months ago`;
+          }
+
+          // Traffic light state determination
+          if (months >= 36) {
+            // RED: Expired
+            lightRed.className = 'light-bulb red active';
+            lightYellow.className = 'light-bulb yellow';
+            lightGreen.className = 'light-bulb green';
+
+            deviceStatusCard.className = 'device-preview-card status-red';
+            statusPillText.className = 'status-pill pill-red';
+            statusPillText.textContent = '🔴 Expired!';
+            statusActionText.textContent = 'Device is 3+ years old! Obsolete — replace immediately.';
+            statusRemainingDays.textContent = `Expired ${Math.abs(remainingDays)} days ago`;
+            statusRemainingDays.style.color = '#f87171';
+          } else if (months >= 33) {
+            // YELLOW: Warning (within 3 months of 3 years)
+            lightRed.className = 'light-bulb red';
+            lightYellow.className = 'light-bulb yellow active';
+            lightGreen.className = 'light-bulb green';
+
+            deviceStatusCard.className = 'device-preview-card status-yellow';
+            statusPillText.className = 'status-pill pill-yellow';
+            statusPillText.textContent = '🟡 Warning (<3 mo)';
+            statusActionText.textContent = 'Approaching 3 years! Start procurement and budget allocation.';
+            statusRemainingDays.textContent = `Only ${remainingDays} days remaining`;
+            statusRemainingDays.style.color = '#fbbf24';
+          } else {
+            // GREEN: Fresh
+            lightRed.className = 'light-bulb red';
+            lightYellow.className = 'light-bulb yellow';
+            lightGreen.className = 'light-bulb green active';
+
+            deviceStatusCard.className = 'device-preview-card status-green';
+            statusPillText.className = 'status-pill pill-green';
+            statusPillText.textContent = '🟢 Fresh & Healthy';
+            statusActionText.textContent = 'Asset is healthy and well within operational lifecycle.';
+            statusRemainingDays.textContent = `${remainingDays} days remaining in 3-year lifecycle`;
+            statusRemainingDays.style.color = '#34d399';
+          }
+        }
+
+        if (lifespanSlider) {
+          lifespanSlider.addEventListener('input', () => {
+            updateTrafficLightWidget();
+          });
+        }
+
+        updateTrafficLightWidget();
+
+        // ======================================================================
+        // SLIDE 6 WIDGET: C# CONSOLE TERMINAL TABLE & SORTING (SUMMARY)
+        // ======================================================================
+        const sampleTerminalAssets = [
+          { type: 'Laptop', model: 'MacBook Pro 16"', office: 'USA', date: '2021-08-15', priceUSD: 2400, localPrice: '$2,400.00', status: 'red' },
+          { type: 'Phone', model: 'iPhone 13 Pro', office: 'USA', date: '2023-11-20', priceUSD: 1100, localPrice: '$1,100.00', status: 'yellow' },
+          { type: 'Laptop', model: 'Dell XPS 15', office: 'Sweden', date: '2024-02-10', priceUSD: 1800, localPrice: '18,900.00 kr', status: 'green' },
+          { type: 'Phone', model: 'Samsung S22', office: 'Sweden', date: '2021-05-12', priceUSD: 850, localPrice: '8,925.00 kr', status: 'red' },
+          { type: 'Laptop', model: 'ThinkPad X1', office: 'Spain', date: '2023-10-05', priceUSD: 1500, localPrice: '1,380.00 €', status: 'yellow' },
+          { type: 'Phone', model: 'iPhone 15', office: 'Spain', date: '2024-06-01', priceUSD: 999, localPrice: '919.08 €', status: 'green' },
+          { type: 'Laptop', model: 'MacBook Air M2', office: 'USA', date: '2024-07-22', priceUSD: 1299, localPrice: '$1,299.00', status: 'green' }
+        ];
+
+        const termTableBody = document.getElementById('termTableBody');
+        const termTotalCount = document.getElementById('termTotalCount');
+        const btnTermSortOffice = document.getElementById('btnTermSortOffice');
+        const btnTermSortAge = document.getElementById('btnTermSortAge');
+
+        function renderTerminalTable(items) {
+          if (!termTableBody) return;
+          termTableBody.innerHTML = '';
+          items.forEach((item) => {
+            const tr = document.createElement('tr');
+            tr.className = `row-${item.status}`;
+            tr.innerHTML = `
+              <td>${item.type}</td>
+              <td style="font-weight:600;">${item.model}</td>
+              <td>${item.office}</td>
+              <td>${item.date}</td>
+              <td>$${item.priceUSD.toLocaleString()}</td>
+              <td style="font-weight:600;">${item.localPrice}</td>
+            `;
+            termTableBody.appendChild(tr);
+          });
+          if (termTotalCount) termTotalCount.textContent = items.length;
+        }
+
+        let officeSortAsc = true;
+        let ageSortAsc = true;
+
+        if (btnTermSortOffice) {
+          btnTermSortOffice.addEventListener('click', () => {
+            playTone(480, 'sine', 0.05, 0.06);
+            sampleTerminalAssets.sort((a, b) => {
+              if (a.office === b.office) return a.date.localeCompare(b.date);
+              return officeSortAsc ? a.office.localeCompare(b.office) : b.office.localeCompare(a.office);
+            });
+            officeSortAsc = !officeSortAsc;
+            btnTermSortOffice.textContent = `Sort: Office ${officeSortAsc ? '↑' : '↓'}`;
+            renderTerminalTable(sampleTerminalAssets);
+          });
+        }
+
+        if (btnTermSortAge) {
+          btnTermSortAge.addEventListener('click', () => {
+            playTone(520, 'sine', 0.05, 0.06);
+            sampleTerminalAssets.sort((a, b) => {
+              return ageSortAsc ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
+            });
+            ageSortAsc = !ageSortAsc;
+            btnTermSortAge.textContent = `Sort: Date ${ageSortAsc ? '↑' : '↓'}`;
+            renderTerminalTable(sampleTerminalAssets);
+          });
+        }
+
+        // Initialize Terminal Table
+        renderTerminalTable(sampleTerminalAssets);
+
+        // ======================================================================
+        // SLIDE 7 WIDGET: .NET 10 C# LIVE INTERACTIVE CODEBASE & COMPILER
+        // ======================================================================
+        const btnGoToSlide6 = document.getElementById('btnGoToSlide6');
+        if (btnGoToSlide6) {
+          btnGoToSlide6.addEventListener('click', () => goToSlide(6));
+        }
+        const btnGoToSlide7 = document.getElementById('btnGoToSlide7');
+        if (btnGoToSlide7) {
+          btnGoToSlide7.addEventListener('click', () => goToSlide(7));
+        }
+
+        const defaultCSharpSource = `// ==============================================================
+// Lexicon Malmö — GearKeeper Device Tracking System (.NET 10)
+// Modern Object-Oriented Architecture with Currency & Expiry Rules
+// ==============================================================
+namespace Lexicon.Malmo.GearKeeper;
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
+// --------------------------------------------------------------
+// 1. BASE BLUEPRINT (Parent Class)
+// --------------------------------------------------------------
+public abstract class Device
+{
+    public required string Model { get; init; }
+    public required decimal PriceUSD { get; init; }
+    public required DateTime PurchaseDate { get; init; }
+    public required string Office { get; init; }
+
+    // Multi-Office Currency Calculation using Pattern Matching
+    public virtual decimal GetPriceInLocalCurrency() => Office switch
+    {
+        "USA"    => PriceUSD * 1.00m,
+        "Sweden" => PriceUSD * 10.50m,
+        "Spain"  => PriceUSD * 0.92m,
+        "UK"     => PriceUSD * 0.79m,
+        _        => PriceUSD
+    };
+
+    // Regional Currency Symbol
+    public virtual string GetCurrencySymbol() => Office switch
+    {
+        "USA"    => "$",
+        "Sweden" => " kr",
+        "Spain"  => " €",
+        "UK"     => " £",
+        _        => "$"
+    };
+
+    // 3-Year "Traffic Light" Lifespan Rule
+    public (ConsoleColor Color, string Status) GetStatus(DateTime today)
+    {
+        TimeSpan age = today - PurchaseDate;
+        TimeSpan lifespan = TimeSpan.FromDays(365 * 3); // 3-Year Lifespan
+        TimeSpan warningThreshold = TimeSpan.FromDays(90); // 3-Month Warning
+
+        if (age >= lifespan)
+            return (ConsoleColor.Red, "Expired (>3y)");
+        if (age >= lifespan - warningThreshold)
+            return (ConsoleColor.Yellow, "Warning (<3mo)");
+        return (ConsoleColor.Green, "Fresh");
+    }
+}
+
+// --------------------------------------------------------------
+// 2. CHILD CLASSES (OOP Inheritance & Specialization)
+// --------------------------------------------------------------
+public class Laptop : Device
+{
+    public double ScreenSizeInches { get; init; } = 15.6;
+}
+
+public class Phone : Device
+{
+    public string SimCardNumber { get; init; } = "SIM-98214";
+}
+
+public class Tablet : Device
+{
+    public bool HasStylus { get; init; } = true;
+}
+
+// --------------------------------------------------------------
+// 3. PROGRAM ENTRY POINT (.NET 10 Console Execution)
+// --------------------------------------------------------------
+public class Program
+{
+    public static void Main()
+    {
+        // Reference evaluation date (Simulated system date)
+        DateTime today = new DateTime(2024, 9, 24);
+
+        // Unified Polymorphic Collection
+        List<Device> devices = new()
+        {
+            new Laptop { Model = "MacBook Pro 16\\"", Office = "USA",    PurchaseDate = new DateTime(2021, 8, 15), PriceUSD = 2400 },
+            new Phone  { Model = "iPhone 13 Pro",   Office = "USA",    PurchaseDate = new DateTime(2023, 11, 20), PriceUSD = 1100 },
+            new Laptop { Model = "Dell XPS 15",     Office = "Sweden", PurchaseDate = new DateTime(2024, 2, 10), PriceUSD = 1800 },
+            new Phone  { Model = "Samsung S22",     Office = "Sweden", PurchaseDate = new DateTime(2021, 5, 12), PriceUSD = 850 },
+            new Laptop { Model = "ThinkPad X1",     Office = "Spain",  PurchaseDate = new DateTime(2023, 10, 5), PriceUSD = 1500 },
+            new Phone  { Model = "iPhone 15",       Office = "Spain",  PurchaseDate = new DateTime(2024, 6, 1),  PriceUSD = 999 },
+            new Laptop { Model = "MacBook Air M2",  Office = "USA",    PurchaseDate = new DateTime(2024, 7, 22), PriceUSD = 1299 }
+        };
+
+        // LINQ: Primary sort by Office, secondary sort by Purchase Date
+        var sortedDevices = devices
+            .OrderBy(d => d.Office)
+            .ThenBy(d => d.PurchaseDate)
+            .ToList();
+
+        // Print Formatted Console Output
+        Console.WriteLine($"{"Type",-8} {"Model",-18} {"Office",-8} {"Purchase Date",-15} {"Price USD",-11} {"Local Currency",-15}");
+        Console.WriteLine(new string('-', 80));
+
+        foreach (var device in sortedDevices)
+        {
+            var (color, status) = device.GetStatus(today);
+            Console.ForegroundColor = color;
+
+            string typeName = device.GetType().Name;
+            decimal localPrice = device.GetPriceInLocalCurrency();
+            string symbol = device.GetCurrencySymbol();
+            string localFormatted = symbol == " kr" 
+                ? $"{localPrice:N2} kr" 
+                : symbol == " €" 
+                    ? $"{localPrice:N2} €" 
+                    : $"{symbol}{localPrice:N2}";
+
+            Console.WriteLine($"{typeName,-8} {device.Model,-18} {device.Office,-8} {device.PurchaseDate:yyyy-MM-dd}     {"$" + device.PriceUSD,-10} {localFormatted,-15}");
+        }
+
+        Console.ResetColor();
+    }
+}`;
+
+        // DOM elements for Slide 6
+        const codeEditorArea = document.getElementById('codeEditorArea');
+        const lineGutter = document.getElementById('lineGutter');
+        const codeLineCount = document.getElementById('codeLineCount');
+        const btnRunCode = document.getElementById('btnRunCode');
+        const btnResetCode = document.getElementById('btnResetCode');
+        const btnCopyCode = document.getElementById('btnCopyCode');
+        const buildStatusPill = document.getElementById('buildStatusPill');
+        const buildStatusText = document.getElementById('buildStatusText');
+        const buildExecutionTime = document.getElementById('buildExecutionTime');
+        const slide6TableBody = document.getElementById('slide6TableBody');
+        const slide6CountBadge = document.getElementById('slide6CountBadge');
+        const slide6TotalUSD = document.getElementById('slide6TotalUSD');
+        const toastMsg = document.getElementById('toastMsg');
+        const toastText = document.getElementById('toastText');
+
+        // Presets DOM buttons
+        const presetDefault = document.getElementById('presetDefault');
+        const presetAddOffice = document.getElementById('presetAddOffice');
+        const presetTwoYear = document.getElementById('presetTwoYear');
+        const presetTabletClass = document.getElementById('presetTabletClass');
+        const presetHighSek = document.getElementById('presetHighSek');
+
+        function showToast(text, duration = 2400) {
+          if (!toastMsg) return;
+          if (toastText) toastText.textContent = text;
+          toastMsg.classList.add('show');
+          setTimeout(() => toastMsg.classList.remove('show'), duration);
+        }
+
+        function updateLineGutter() {
+          if (!codeEditorArea || !lineGutter) return;
+          const lines = codeEditorArea.value.split('\n');
+          const count = lines.length;
+          let html = '';
+          for (let i = 1; i <= count; i++) {
+            html += `<div>${i}</div>`;
+          }
+          lineGutter.innerHTML = html;
+          if (codeLineCount) codeLineCount.textContent = `${count} lines`;
+          lineGutter.scrollTop = codeEditorArea.scrollTop;
+        }
+
+        if (codeEditorArea) {
+          codeEditorArea.value = defaultCSharpSource;
+          updateLineGutter();
+
+          codeEditorArea.addEventListener('input', updateLineGutter);
+          codeEditorArea.addEventListener('scroll', () => {
+            if (lineGutter) lineGutter.scrollTop = codeEditorArea.scrollTop;
+          });
+
+          // Enable Tab key support in textarea
+          codeEditorArea.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+              e.preventDefault();
+              const start = codeEditorArea.selectionStart;
+              const end = codeEditorArea.selectionEnd;
+              const val = codeEditorArea.value;
+              codeEditorArea.value = val.substring(0, start) + '    ' + val.substring(end);
+              codeEditorArea.selectionStart = codeEditorArea.selectionEnd = start + 4;
+              updateLineGutter();
+            }
+          });
+        }
+
+        // --- C# .NET 10 RUNTIME SIMULATOR & COMPILER ---
+        function executeCSharpCode() {
+          playTone(840, 'triangle', 0.08, 0.09);
+
+          if (buildStatusPill) {
+            buildStatusPill.innerHTML = `<span class="build-dot" style="background:#f59e0b; box-shadow:0 0 8px #f59e0b;"></span><span>Compiling with .NET 10.0...</span>`;
+          }
+
+          setTimeout(() => {
+            const code = codeEditorArea ? codeEditorArea.value : defaultCSharpSource;
+
+            // 1. Parse Exchange Rates
+            const rates = { USA: 1.00, Sweden: 10.50, Spain: 0.92, UK: 0.79 };
+            const symbols = { USA: '$', Sweden: ' kr', Spain: ' €', UK: ' £' };
+
+            const rateRegex = /"([A-Za-z]+)"\s*=>\s*PriceUSD\s*\*\s*([\d\.]+)m?/g;
+            let rateMatch;
+            while ((rateMatch = rateRegex.exec(code)) !== null) {
+              const office = rateMatch[1];
+              const multiplier = parseFloat(rateMatch[2]);
+              if (!isNaN(multiplier)) rates[office] = multiplier;
+            }
+
+            // 2. Parse Lifespan & Warning Rule
+            let lifespanYears = 3;
+            const lifespanMatch = /TimeSpan\.FromDays\(365\s*\*\s*(\d+)\)/.exec(code);
+            if (lifespanMatch) lifespanYears = parseInt(lifespanMatch[1], 10);
+
+            let warningDays = 90;
+            const warningMatch = /TimeSpan\.FromDays\((\d+)\)/.exec(code);
+            if (warningMatch && !lifespanMatch) {
+              warningDays = parseInt(warningMatch[1], 10);
+            }
+
+            // 3. Parse Assets list
+            let assets = [];
+            // Match instantiations like: new Laptop { Model = "MacBook Pro 16\"", Office = "USA", PurchaseDate = new DateTime(2021, 8, 15), PriceUSD = 2400 }
+            const assetRegex = /new\s+([A-Za-z]+)\s*\{\s*([^}]+)\}/g;
+            let assetMatch;
+
+            while ((assetMatch = assetRegex.exec(code)) !== null) {
+              const type = assetMatch[1];
+              const body = assetMatch[2];
+
+              // Skip non-device definitions if any
+              if (type !== 'Laptop' && type !== 'Phone' && type !== 'Tablet' && type !== 'Device' && type !== 'Asset') continue;
+
+              const modelMatch = /Model\s*=\s*"([^"]+)"/.exec(body);
+              const officeMatch = /Office\s*=\s*"([^"]+)"/.exec(body);
+              const dateMatch = /PurchaseDate\s*=\s*new\s+DateTime\((\d{4}),\s*(\d{1,2}),\s*(\d{1,2})\)/.exec(body);
+              const priceMatch = /PriceUSD\s*=\s*(\d+)/.exec(body);
+
+              if (modelMatch && officeMatch && dateMatch && priceMatch) {
+                const year = parseInt(dateMatch[1], 10);
+                const month = parseInt(dateMatch[2], 10);
+                const day = parseInt(dateMatch[3], 10);
+                const priceUSD = parseInt(priceMatch[1], 10);
+                const office = officeMatch[1];
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+                assets.push({
+                  type,
+                  model: modelMatch[1],
+                  office,
+                  dateStr,
+                  date: new Date(year, month - 1, day),
+                  priceUSD
+                });
+              }
+            }
+
+            // 4. Parse LINQ Filter (.Where) and Sorting (.OrderBy / .ThenBy / .OrderByDescending)
+            // Filter by Office
+            const whereOfficeMatch = /\.Where\s*\(\s*d\s*=>\s*d\.Office\s*==\s*"([^"]+)"\s*\)/.exec(code);
+            if (whereOfficeMatch) {
+              const filterOffice = whereOfficeMatch[1];
+              assets = assets.filter((a) => a.office.toLowerCase() === filterOffice.toLowerCase());
+            }
+
+            // LINQ Sorting Evaluation
+            if (code.includes('OrderByDescending(d => d.PriceUSD)') || code.includes('OrderByDescending(x => x.PriceUSD)')) {
+              assets.sort((a, b) => b.priceUSD - a.priceUSD);
+            } else if (code.includes('OrderByDescending(d => d.PurchaseDate)') || code.includes('OrderByDescending(x => x.PurchaseDate)')) {
+              assets.sort((a, b) => b.date - a.date);
+            } else if (code.includes('OrderBy(d => d.PurchaseDate)') && !code.includes('OrderBy(d => d.Office)')) {
+              assets.sort((a, b) => a.date - b.date);
+            } else {
+              // Default: Primary sort by Office, Secondary sort by PurchaseDate
+              assets.sort((a, b) => {
+                if (a.office === b.office) {
+                  return a.date - b.date;
+                }
+                return a.office.localeCompare(b.office);
+              });
+            }
+
+            // 5. Evaluate Traffic Light Status against Simulated Reference Date (2024-09-24)
+            const refDate = new Date(2024, 8, 24);
+            const lifespanMs = lifespanYears * 365 * 24 * 60 * 60 * 1000;
+            const warningMs = warningDays * 24 * 60 * 60 * 1000;
+
+            let totalUSD = 0;
+
+            if (!slide6TableBody) return;
+            slide6TableBody.innerHTML = '';
+
+            if (assets.length === 0) {
+              slide6TableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#f87171; padding:20px;">CS1002 / CS0103: No valid asset objects found in collection. Check syntax.</td></tr>`;
+              if (buildStatusPill) {
+                buildStatusPill.innerHTML = `<span class="build-dot" style="background:#ef4444; box-shadow:0 0 8px #ef4444;"></span><span style="color:#f87171;">Build Warning: 0 Assets Parsed</span>`;
+              }
+              return;
+            }
+
+            assets.forEach((a) => {
+              totalUSD += a.priceUSD;
+              const ageMs = refDate - a.date;
+
+              let statusColor = 'green';
+              if (ageMs >= lifespanMs) {
+                statusColor = 'red';
+              } else if (ageMs >= lifespanMs - warningMs) {
+                statusColor = 'yellow';
+              }
+
+              const rate = rates[a.office] || 1.00;
+              const sym = symbols[a.office] || '$';
+              const localPrice = a.priceUSD * rate;
+              const formattedLocal = sym === ' kr'
+                ? `${localPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr`
+                : sym === ' €'
+                  ? `${localPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`
+                  : sym === ' £'
+                    ? `£${localPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                    : `$${localPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+              const tr = document.createElement('tr');
+              tr.className = `row-${statusColor}`;
+              tr.innerHTML = `
+                <td>${a.type}</td>
+                <td style="font-weight:600;">${a.model}</td>
+                <td>${a.office}</td>
+                <td>${a.dateStr}</td>
+                <td>$${a.priceUSD.toLocaleString()}</td>
+                <td style="font-weight:600;">${formattedLocal}</td>
+              `;
+              slide6TableBody.appendChild(tr);
+            });
+
+            if (slide6CountBadge) slide6CountBadge.textContent = assets.length;
+            if (slide6TotalUSD) slide6TotalUSD.textContent = `$${totalUSD.toLocaleString()}`;
+
+            const compileDuration = 10 + Math.floor(Math.random() * 8);
+            if (buildStatusPill) {
+              buildStatusPill.innerHTML = `<span class="build-dot"></span><span style="color:#34d399;">Build Succeeded: 0 Errors, 0 Warnings • .NET 10.0</span>`;
+            }
+            if (buildExecutionTime) {
+              buildExecutionTime.textContent = `Compiled in ${compileDuration}ms`;
+            }
+          }, 140);
+        }
+
+        // Button Listeners
+        if (btnRunCode) {
+          btnRunCode.addEventListener('click', () => {
+            executeCSharpCode();
+            showToast('⚡ C# Program Recompiled and Executed!');
+          });
+        }
+
+        if (btnResetCode) {
+          btnResetCode.addEventListener('click', () => {
+            if (codeEditorArea) {
+              codeEditorArea.value = defaultCSharpSource;
+              updateLineGutter();
+              executeCSharpCode();
+              showToast('↺ Code Reset to Default .NET 10 Blueprint');
+            }
+          });
+        }
+
+        if (btnCopyCode) {
+          btnCopyCode.addEventListener('click', () => {
+            if (codeEditorArea) {
+              navigator.clipboard.writeText(codeEditorArea.value).then(() => {
+                playTone(960, 'sine', 0.1, 0.12);
+                showToast('📋 All C# Code Copied to Clipboard!');
+              }).catch(() => {
+                showToast('Failed to copy. Please select text manually.');
+              });
+            }
+          });
+        }
+
+        // --- PRESET & DEVICE INJECTION HANDLERS ---
+        let selectedQuickOffice = 'Sweden';
+
+        // Location Selector Toggle
+        const locBtns = document.querySelectorAll('.location-toggle-group .loc-btn');
+        locBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            locBtns.forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedQuickOffice = btn.dataset.loc || 'Sweden';
+            playTone(620, 'sine', 0.04, 0.06);
+            showToast(`📍 Selected Location: ${selectedQuickOffice}`);
+          });
+        });
+
+        // Toggle Custom Device Drawer
+        const btnToggleCustomAdd = document.getElementById('btnToggleCustomAdd');
+        const customDeviceDrawer = document.getElementById('customDeviceDrawer');
+        if (btnToggleCustomAdd && customDeviceDrawer) {
+          btnToggleCustomAdd.addEventListener('click', () => {
+            const isHidden = customDeviceDrawer.style.display === 'none';
+            customDeviceDrawer.style.display = isHidden ? 'flex' : 'none';
+            btnToggleCustomAdd.style.background = isHidden ? 'rgba(6,182,212,0.25)' : '';
+            playTone(560, 'sine', 0.05, 0.08);
+          });
+        }
+
+        // Generic C# Device Injection Engine
+        function injectDeviceIntoCSharp({ type, model, office, priceUSD, year, month, day }) {
+          if (!codeEditorArea) return;
+          let code = codeEditorArea.value;
+
+          // 1. If Tablet is used, ensure 'public class Tablet : Device' exists
+          if (type === 'Tablet' && !code.includes('class Tablet : Device')) {
+            const phoneClassStr = 'public class Phone : Device\n{\n    public string SimCardNumber { get; init; } = "SIM-98214";\n}';
+            if (code.includes(phoneClassStr)) {
+              code = code.replace(
+                phoneClassStr,
+                `${phoneClassStr}\n\npublic class Tablet : Device\n{\n    public bool HasStylus { get; init; } = true;\n}`
+              );
+            }
+          }
+
+          // 2. Format C# statement
+          const sanitizedModel = model.replace(/"/g, '\\"');
+          const newDeviceLine = `            new ${type} { Model = "${sanitizedModel}", Office = "${office}", PurchaseDate = new DateTime(${year}, ${month}, ${day}), PriceUSD = ${priceUSD} }`;
+
+          // 3. Insert cleanly into devices collection
+          const lastClosingBracket = code.lastIndexOf('};');
+          if (lastClosingBracket !== -1) {
+            // Find the last device line before closing
+            const beforeClosing = code.substring(0, lastClosingBracket);
+            const afterClosing = code.substring(lastClosingBracket);
+            const trimmedBefore = beforeClosing.trimEnd();
+
+            // Add comma to previous last item if needed
+            const endsWithComma = trimmedBefore.endsWith(',');
+            const separator = endsWithComma ? '\n' : ',\n';
+
+            code = trimmedBefore + separator + newDeviceLine + '\n        ' + afterClosing;
+          }
+
+          codeEditorArea.value = code;
+          updateLineGutter();
+          executeCSharpCode();
+
+          playTone(880, 'sine', 0.08, 0.12);
+          showToast(`✨ Injected ${model} (${type}) into ${office}!`);
+        }
+
+        // Quick Add Device Buttons
+        const btnAddIPad = document.getElementById('btnAddIPad');
+        if (btnAddIPad) {
+          btnAddIPad.addEventListener('click', () => {
+            injectDeviceIntoCSharp({
+              type: 'Tablet',
+              model: 'iPad Pro 12.9"',
+              office: selectedQuickOffice,
+              priceUSD: 1199,
+              year: 2024,
+              month: 4,
+              day: 18
+            });
+          });
+        }
+
+        const btnAddGalaxyTab = document.getElementById('btnAddGalaxyTab');
+        if (btnAddGalaxyTab) {
+          btnAddGalaxyTab.addEventListener('click', () => {
+            injectDeviceIntoCSharp({
+              type: 'Tablet',
+              model: 'Galaxy Tab S9',
+              office: selectedQuickOffice,
+              priceUSD: 899,
+              year: 2024,
+              month: 5,
+              day: 10
+            });
+          });
+        }
+
+        const btnAddIPhone15 = document.getElementById('btnAddIPhone15');
+        if (btnAddIPhone15) {
+          btnAddIPhone15.addEventListener('click', () => {
+            injectDeviceIntoCSharp({
+              type: 'Phone',
+              model: 'iPhone 15 Pro',
+              office: selectedQuickOffice,
+              priceUSD: 999,
+              year: 2024,
+              month: 6,
+              day: 1
+            });
+          });
+        }
+
+        const btnAddGalaxyS24 = document.getElementById('btnAddGalaxyS24');
+        if (btnAddGalaxyS24) {
+          btnAddGalaxyS24.addEventListener('click', () => {
+            injectDeviceIntoCSharp({
+              type: 'Phone',
+              model: 'Samsung Galaxy S24',
+              office: selectedQuickOffice,
+              priceUSD: 899,
+              year: 2024,
+              month: 3,
+              day: 22
+            });
+          });
+        }
+
+        const btnAddMacBook = document.getElementById('btnAddMacBook');
+        if (btnAddMacBook) {
+          btnAddMacBook.addEventListener('click', () => {
+            injectDeviceIntoCSharp({
+              type: 'Laptop',
+              model: 'MacBook Pro 14"',
+              office: selectedQuickOffice,
+              priceUSD: 1999,
+              year: 2024,
+              month: 2,
+              day: 15
+            });
+          });
+        }
+
+        const btnAddThinkPad = document.getElementById('btnAddThinkPad');
+        if (btnAddThinkPad) {
+          btnAddThinkPad.addEventListener('click', () => {
+            injectDeviceIntoCSharp({
+              type: 'Laptop',
+              model: 'ThinkPad X1 Carbon',
+              office: selectedQuickOffice,
+              priceUSD: 1499,
+              year: 2024,
+              month: 1,
+              day: 20
+            });
+          });
+        }
+
+        // Custom Device Drawer Form Submission
+        const btnSubmitCustomDevice = document.getElementById('btnSubmitCustomDevice');
+        const customTypeSelect = document.getElementById('customTypeSelect');
+        const customModelInput = document.getElementById('customModelInput');
+        const customOfficeSelect = document.getElementById('customOfficeSelect');
+        const customAgeSelect = document.getElementById('customAgeSelect');
+        const customPriceInput = document.getElementById('customPriceInput');
+
+        if (btnSubmitCustomDevice) {
+          btnSubmitCustomDevice.addEventListener('click', () => {
+            const type = customTypeSelect?.value || 'Tablet';
+            const model = customModelInput?.value.trim() || 'Generic Device';
+            const office = customOfficeSelect?.value || 'Sweden';
+            const priceUSD = parseInt(customPriceInput?.value, 10) || 999;
+            const ageCondition = customAgeSelect?.value || 'fresh';
+
+            let year = 2024, month = 7, day = 15;
+            if (ageCondition === 'warning') {
+              year = 2021; month = 12; day = 5; // ~2.8 years old (warning)
+            } else if (ageCondition === 'expired') {
+              year = 2020; month = 4; day = 10; // ~4.4 years old (expired)
+            }
+
+            injectDeviceIntoCSharp({ type, model, office, priceUSD, year, month, day });
+          });
+        }
+
+        // --- INTERACTIVE LINQ FILTER & SORTING ENGINE ---
+        let currentLinqFilter = 'all';
+        let currentLinqSort = 'office-date';
+
+        function updateCSharpLinqQuery() {
+          if (!codeEditorArea) return;
+          let code = codeEditorArea.value;
+
+          // Build new LINQ query lines
+          let linqCode = 'var sortedDevices = devices';
+          if (currentLinqFilter !== 'all') {
+            linqCode += `\n            .Where(d => d.Office == "${currentLinqFilter}")`;
+          }
+
+          if (currentLinqSort === 'office-date') {
+            linqCode += `\n            .OrderBy(d => d.Office)\n            .ThenBy(d => d.PurchaseDate)`;
+          } else if (currentLinqSort === 'date-asc') {
+            linqCode += `\n            .OrderBy(d => d.PurchaseDate)`;
+          } else if (currentLinqSort === 'date-desc') {
+            linqCode += `\n            .OrderByDescending(d => d.PurchaseDate)`;
+          } else if (currentLinqSort === 'price-desc') {
+            linqCode += `\n            .OrderByDescending(d => d.PriceUSD)`;
+          }
+
+          linqCode += '\n            .ToList();';
+
+          // Replace existing LINQ statement in code editor
+          const linqBlockRegex = /var\s+sortedDevices\s*=\s*devices[\s\S]*?\.ToList\(\);/;
+          if (linqBlockRegex.test(code)) {
+            code = code.replace(linqBlockRegex, linqCode);
+            codeEditorArea.value = code;
+            updateLineGutter();
+            executeCSharpCode();
+          }
+        }
+
+        const linqFilterBtns = document.querySelectorAll('.linq-btn');
+        linqFilterBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            linqFilterBtns.forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentLinqFilter = btn.dataset.linqFilter || 'all';
+            playTone(660, 'sine', 0.05, 0.07);
+            updateCSharpLinqQuery();
+            showToast(currentLinqFilter === 'all' ? '🔍 LINQ: All Offices' : `🔍 LINQ: .Where(d => d.Office == "${currentLinqFilter}")`);
+          });
+        });
+
+        const linqSortBtns = document.querySelectorAll('.linq-sort-btn');
+        linqSortBtns.forEach((btn) => {
+          btn.addEventListener('click', () => {
+            linqSortBtns.forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentLinqSort = btn.dataset.linqSort || 'office-date';
+            playTone(720, 'triangle', 0.05, 0.07);
+            updateCSharpLinqQuery();
+            showToast(`🔀 LINQ: .OrderBy(${currentLinqSort}) applied in C#`);
+          });
+        });
+
+        if (presetDefault) {
+          presetDefault.addEventListener('click', () => {
+            if (codeEditorArea) {
+              codeEditorArea.value = defaultCSharpSource;
+              currentLinqFilter = 'all';
+              currentLinqSort = 'office-date';
+              linqFilterBtns.forEach((b) => b.classList.toggle('active', b.dataset.linqFilter === 'all'));
+              linqSortBtns.forEach((b) => b.classList.toggle('active', b.dataset.linqSort === 'office-date'));
+              updateLineGutter();
+              executeCSharpCode();
+              showToast('↺ Code Reset to Default .NET 10 Setup');
+            }
+          });
+        }
+
+        // --- WORKBENCH VIEW TABS (Split / Code / Console) ---
+        const tabModeSplit = document.getElementById('tabModeSplit');
+        const tabModeCode = document.getElementById('tabModeCode');
+        const tabModeConsole = document.getElementById('tabModeConsole');
+        const workbenchCodePane = document.getElementById('workbenchCodePane');
+        const workbenchConsolePane = document.getElementById('workbenchConsolePane');
+
+        function setWorkbenchMode(mode) {
+          if (!workbenchCodePane || !workbenchConsolePane) return;
+          [tabModeSplit, tabModeCode, tabModeConsole].forEach(b => b?.classList.remove('active'));
+
+          if (mode === 'code') {
+            tabModeCode?.classList.add('active');
+            workbenchCodePane.style.display = 'flex';
+            workbenchCodePane.style.flex = '1';
+            workbenchCodePane.style.borderRight = 'none';
+            workbenchConsolePane.style.display = 'none';
+          } else if (mode === 'console') {
+            tabModeConsole?.classList.add('active');
+            workbenchCodePane.style.display = 'none';
+            workbenchConsolePane.style.display = 'flex';
+            workbenchConsolePane.style.flex = '1';
+          } else {
+            // Split mode
+            tabModeSplit?.classList.add('active');
+            workbenchCodePane.style.display = 'flex';
+            workbenchCodePane.style.flex = '1.12';
+            workbenchCodePane.style.borderRight = '1px solid rgba(255, 255, 255, 0.08)';
+            workbenchConsolePane.style.display = 'flex';
+            workbenchConsolePane.style.flex = '0.98';
+          }
+          updateLineGutter();
+        }
+
+        if (tabModeSplit) tabModeSplit.addEventListener('click', () => setWorkbenchMode('split'));
+        if (tabModeCode) tabModeCode.addEventListener('click', () => setWorkbenchMode('code'));
+        if (tabModeConsole) tabModeConsole.addEventListener('click', () => setWorkbenchMode('console'));
+
+        // Initialize Slide 6 execution
+        executeCSharpCode();
+
+      })();
+    </script>
+  </body>
+</html>
